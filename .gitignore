@@ -16,6 +16,8 @@ cq-provider-*
 .cq_reattach
 # Local .terraform directories
 **/.terraform/*
+# Local .terraform.lock.hcl files
+**/terraform/**/local/.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
@@ -32,3 +34,4 @@ terraform/infra/.terraform
 terraform/infra/.terraform.lock.hcl
 terraform/infra/terraform-override.tf
 terraform/infra/tmp/
+auth.json

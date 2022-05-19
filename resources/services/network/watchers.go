@@ -4,16 +4,18 @@ import (
 	"context"
 
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
 
 func NetworkWatchers() *schema.Table {
 	return &schema.Table{
-		Name:         "azure_network_watchers",
-		Description:  "Azure network watcher",
-		Resolver:     fetchNetworkWatchers,
-		Multiplex:    client.SubscriptionMultiplex,
-		DeleteFilter: client.DeleteSubscriptionFilter,
+		Name:          "azure_network_watchers",
+		Description:   "Azure network watcher",
+		Resolver:      fetchNetworkWatchers,
+		Multiplex:     client.SubscriptionMultiplex,
+		DeleteFilter:  client.DeleteSubscriptionFilter,
+		IgnoreInTests: true,
 		Columns: []schema.Column{
 			{
 				Name:        "subscription_id",
@@ -69,7 +71,7 @@ func fetchNetworkWatchers(ctx context.Context, meta schema.ClientMeta, parent *s
 	svc := meta.(*client.Client).Services().Network.Watchers
 	result, err := svc.ListAll(ctx)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	if result.Value == nil {
 		return nil

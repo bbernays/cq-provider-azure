@@ -3,15 +3,17 @@ module github.com/cloudquery/cq-provider-azure
 go 1.17
 
 require (
-	github.com/Azure/azure-sdk-for-go v58.0.0+incompatible
+	github.com/Azure/azure-sdk-for-go v61.6.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.21
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.7
-	github.com/cloudquery/cq-provider-sdk v0.6.1
+	github.com/cloudquery/cq-provider-sdk v0.9.4
 	github.com/cloudquery/faker/v3 v3.7.5
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/hashicorp/go-hclog v1.0.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tombuildsstuff/giovanni v0.16.0
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (
@@ -33,7 +35,6 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/georgysavva/scany v0.2.9 // indirect
-	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
@@ -44,8 +45,6 @@ require (
 	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.10.1 // indirect
 	github.com/hashicorp/yamux v0.0.0-20210826001029-26ff87cf9493 // indirect
-	github.com/huandu/go-sqlbuilder v1.13.0 // indirect
-	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.0 // indirect
@@ -70,6 +69,7 @@ require (
 	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/oklog/run v1.1.0 // indirect
+	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
@@ -83,7 +83,6 @@ require (
 	go.uber.org/atomic v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210825183410-e898025ed96a // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/genproto v0.0.0-20211129164237-f09f9a12af12 // indirect

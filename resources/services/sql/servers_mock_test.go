@@ -1,14 +1,11 @@
-//go:build !integration
-
 package sql
 
 import (
 	"context"
 	"testing"
 
-	"github.com/cloudquery/cq-provider-azure/client"
-
 	"github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/v4.0/sql"
+	"github.com/cloudquery/cq-provider-azure/client"
 	"github.com/cloudquery/cq-provider-azure/client/services"
 	"github.com/cloudquery/cq-provider-azure/client/services/mocks"
 	"github.com/cloudquery/faker/v3"
@@ -26,22 +23,30 @@ func buildSQLServerMock(t *testing.T, ctrl *gomock.Controller) services.Services
 	databaseThreatsSvc := mocks.NewMockSQLDatabaseThreatDetectionPoliciesClient(ctrl)
 	serverVulnsSvc := mocks.NewMockSQLServerVulnerabilityAssessmentsClient(ctrl)
 	dbVulnsSvc := mocks.NewMockSQLDatabaseVulnerabilityAssessmentsClient(ctrl)
+	dbVulnsScansSvc := mocks.NewMockSQLDatabaseVulnerabilityAssessmentScansClient(ctrl)
 	encSvc := mocks.NewMockTransparentDataEncryptionsClient(ctrl)
 	epSvc := mocks.NewMockEncryptionProtectorsClient(ctrl)
+	vnrSvc := mocks.NewMockSQLVirtualNetworkRulesClient(ctrl)
+	ssapSvc := mocks.NewMockServerSecurityAlertPoliciesClient(ctrl)
+	bltrpSvc := mocks.NewMockBackupLongTermRetentionPoliciesClient(ctrl)
 	s := services.Services{
 		SQL: services.SQLClient{
-			DatabaseBlobAuditingPolicies:     databaseBlobSvc,
-			Databases:                        databaseSvc,
-			DatabaseThreatDetectionPolicies:  databaseThreatsSvc,
-			DatabaseVulnerabilityAssessments: dbVulnsSvc,
-			Firewall:                         firewallSvc,
-			ServerAdmins:                     adminsSvc,
-			ServerBlobAuditingPolicies:       serverBlobSvc,
-			ServerDevOpsAuditSettings:        devopsAuditSvc,
-			Servers:                          serverSvc,
-			ServerVulnerabilityAssessments:   serverVulnsSvc,
-			TransparentDataEncryptions:       encSvc,
-			EncryptionProtectors:             epSvc,
+			BackupLongTermRetentionPolicies:      bltrpSvc,
+			DatabaseBlobAuditingPolicies:         databaseBlobSvc,
+			Databases:                            databaseSvc,
+			DatabaseThreatDetectionPolicies:      databaseThreatsSvc,
+			DatabaseVulnerabilityAssessments:     dbVulnsSvc,
+			DatabaseVulnerabilityAssessmentScans: dbVulnsScansSvc,
+			Firewall:                             firewallSvc,
+			ServerAdmins:                         adminsSvc,
+			ServerBlobAuditingPolicies:           serverBlobSvc,
+			ServerDevOpsAuditSettings:            devopsAuditSvc,
+			Servers:                              serverSvc,
+			ServerVulnerabilityAssessments:       serverVulnsSvc,
+			TransparentDataEncryptions:           encSvc,
+			EncryptionProtectors:                 epSvc,
+			VirtualNetworkRules:                  vnrSvc,
+			ServerSecurityAlertPolicies:          ssapSvc,
 		},
 	}
 	server := sql.Server{}
@@ -85,6 +90,19 @@ func buildSQLServerMock(t *testing.T, ctrl *gomock.Controller) services.Services
 			sql.DatabaseBlobAuditingPolicyListResult{Value: &[]sql.DatabaseBlobAuditingPolicy{databaseBlobPolicy}},
 			func(context.Context, sql.DatabaseBlobAuditingPolicyListResult) (sql.DatabaseBlobAuditingPolicyListResult, error) {
 				return sql.DatabaseBlobAuditingPolicyListResult{}, nil
+			},
+		), nil,
+	)
+
+	var scanRecord sql.VulnerabilityAssessmentScanRecord
+	if err := faker.FakeData(&scanRecord); err != nil {
+		t.Fatal(err)
+	}
+	dbVulnsScansSvc.EXPECT().ListByDatabase(gomock.Any(), "test", *server.Name, *database.Name).Return(
+		sql.NewVulnerabilityAssessmentScanRecordListResultPage(
+			sql.VulnerabilityAssessmentScanRecordListResult{Value: &[]sql.VulnerabilityAssessmentScanRecord{scanRecord}},
+			func(context.Context, sql.VulnerabilityAssessmentScanRecordListResult) (sql.VulnerabilityAssessmentScanRecordListResult, error) {
+				return sql.VulnerabilityAssessmentScanRecordListResult{}, nil
 			},
 		), nil,
 	)
@@ -182,6 +200,39 @@ func buildSQLServerMock(t *testing.T, ctrl *gomock.Controller) services.Services
 	epSvc.EXPECT().Get(gomock.Any(), gomock.Any(), gomock.Any()).Return(
 		ep, nil,
 	)
+
+	var vnr sql.VirtualNetworkRule
+	if err := faker.FakeData(&vnr); err != nil {
+		t.Fatal(err)
+	}
+	vnrSvc.EXPECT().ListByServer(gomock.Any(), "test", *server.Name).Return(
+		sql.NewVirtualNetworkRuleListResultPage(
+			sql.VirtualNetworkRuleListResult{Value: &[]sql.VirtualNetworkRule{vnr}},
+			func(context.Context, sql.VirtualNetworkRuleListResult) (sql.VirtualNetworkRuleListResult, error) {
+				return sql.VirtualNetworkRuleListResult{}, nil
+			},
+		), nil,
+	)
+
+	var ssap sql.ServerSecurityAlertPolicy
+	if err := faker.FakeData(&ssap); err != nil {
+		t.Fatal(err)
+	}
+	ssapSvc.EXPECT().ListByServer(gomock.Any(), "test", *server.Name).Return(
+		sql.NewLogicalServerSecurityAlertPolicyListResultPage(
+			sql.LogicalServerSecurityAlertPolicyListResult{Value: &[]sql.ServerSecurityAlertPolicy{ssap}},
+			func(ctx context.Context, result sql.LogicalServerSecurityAlertPolicyListResult) (sql.LogicalServerSecurityAlertPolicyListResult, error) {
+				return sql.LogicalServerSecurityAlertPolicyListResult{}, nil
+			},
+		), nil,
+	)
+
+	var p sql.BackupLongTermRetentionPolicy
+	if err := faker.FakeData(&p); err != nil {
+		t.Fatal(err)
+	}
+	bltrpSvc.EXPECT().ListByDatabase(gomock.Any(), "test", *server.Name, *database.Name).Return(p, nil)
+
 	return s
 }
 

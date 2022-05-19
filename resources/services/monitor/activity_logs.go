@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
 
@@ -25,10 +26,11 @@ func MonitorActivityLogs() *schema.Table {
 				Resolver:    schema.PathResolver("Authorization.Action"),
 			},
 			{
-				Name:        "authorization_role",
-				Description: "the role of the user For instance: Subscription Admin",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("Authorization.Role"),
+				Name:          "authorization_role",
+				Description:   "the role of the user For instance: Subscription Admin",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("Authorization.Role"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "authorization_scope",
@@ -112,10 +114,11 @@ func MonitorActivityLogs() *schema.Table {
 				Resolver:    schema.PathResolver("HTTPRequest.Method"),
 			},
 			{
-				Name:        "http_request_uri",
-				Description: "the Uri",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("HTTPRequest.URI"),
+				Name:          "http_request_uri",
+				Description:   "the Uri",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("HTTPRequest.URI"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "level",
@@ -242,7 +245,7 @@ func fetchMonitorActivityLogs(ctx context.Context, meta schema.ClientMeta, paren
 	filter := fmt.Sprintf("eventTimestamp ge '%s' and eventTimestamp le '%s'", past.Format(time.RFC3339Nano), now.Format(time.RFC3339Nano))
 	response, err := svc.List(ctx, filter, "")
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	// azure returns same events sometimes so we have to filter out the duplicates
 	seen := make(map[string]struct{})
@@ -254,9 +257,12 @@ func fetchMonitorActivityLogs(ctx context.Context, meta schema.ClientMeta, paren
 			seen[*v.ID] = struct{}{}
 			res <- v
 		}
-		if err := response.NextWithContext(ctx); err != nil {
-			return err
-		}
+		// this seems to fail with the filter - https://github.com/Azure/azure-sdk-for-go/issues/15108
+		// TODO: follow this issue and change
+		break
+		// if err := response.NextWithContext(ctx); err != nil {
+		// 	return diag.WrapError(err)
+		// }
 	}
 	return nil
 }

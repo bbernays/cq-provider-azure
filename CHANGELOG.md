@@ -1,3 +1,7 @@
+# Deprecated
+
+Changelog is now under GitHub Releases page
+
 # Changelog
 
 All notable changes to this provider will be documented in this file.
@@ -7,12 +11,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- 
 ## Unreleased
-### 🚀 Added
-### :gear: Changed
-### :spider: Fixed
-### 💥 Breaking Changes
+### Added
+### Changed
+### Fixed
+### Breaking Changes
 
 -->
+
+### [0.10.3](https://github.com/cloudquery/cq-provider-azure/compare/v0.10.2...v0.10.3) (2022-05-17)
+
+
+### Bug Fixes
+
+* **deps:** Update module github.com/cloudquery/cq-provider-sdk to v0.9.4 ([#281](https://github.com/cloudquery/cq-provider-azure/issues/281)) ([9d9da12](https://github.com/cloudquery/cq-provider-azure/commit/9d9da12d3759761fcbdc935cee0b33f683c8bcf4))
+
+### [0.10.2](https://github.com/cloudquery/cq-provider-azure/compare/v0.10.1...v0.10.2) (2022-05-10)
+
+
+### Miscellaneous Chores
+
+* Release 0.10.2 ([#270](https://github.com/cloudquery/cq-provider-azure/issues/270)) ([35fd989](https://github.com/cloudquery/cq-provider-azure/commit/35fd989a2d4fd57abcc45c58cab7e2d4e7750e83))
+
+## [v0.3.9] - 2022-01-03
+###### SDK Version: 0.6.1
+### 🚀 Added
+* Add `keyvault.vault` resource back (this result requires special permissions) [#111](https://github.com/cloudquery/cq-provider-azure/pull/111)
 
 ## [v0.3.9] - 2022-01-03
 ###### SDK Version: 0.6.1
@@ -32,6 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### :spider: Fixed
 * Fixed names of `azure_network_virtual_network_subnets`, `azure_network_virtual_network_peerings`, `azure_network_virtual_network_ip_allocations` tables according to naming convention [#76](https://github.com/cloudquery/cq-provider-azure/issues/76)
+### :gear: Changed
+* `azure_network_virtual_network_ip_allocations` is now a string array column of `azure_network_virtual_networks`  
 
 
 ## [v0.3.7] - 2021-10-07

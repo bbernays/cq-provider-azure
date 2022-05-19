@@ -2,11 +2,13 @@ package client
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Azure/azure-sdk-for-go/services/subscription/mgmt/2020-09-01/subscription"
 	_ "github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/cloudquery/cq-provider-azure/client/services"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 	"github.com/hashicorp/go-hclog"
 )
@@ -51,14 +53,19 @@ func (c Client) withSubscription(subscriptionId string) *Client {
 	}
 }
 
-func Configure(logger hclog.Logger, config interface{}) (schema.ClientMeta, error) {
+func Configure(logger hclog.Logger, config interface{}) (schema.ClientMeta, diag.Diagnostics) {
 	providerConfig := config.(*Config)
 
-	azureAuth, err := auth.NewAuthorizerFromEnvironment()
-
+	logger.Info("Trying to authenticate via CLI")
+	azureAuth, err := auth.NewAuthorizerFromCLI()
 	if err != nil {
-		return nil, err
+		logger.Info("Trying to authenticate via environment variables")
+		azureAuth, err = auth.NewAuthorizerFromEnvironment()
+		if err != nil {
+			return nil, diag.FromError(err, diag.USER)
+		}
 	}
+
 	client := NewAzureClient(logger, providerConfig.Subscriptions)
 
 	if len(providerConfig.Subscriptions) == 0 {
@@ -67,23 +74,39 @@ func Configure(logger hclog.Logger, config interface{}) (schema.ClientMeta, erro
 		svc.Authorizer = azureAuth
 		res, err := svc.List(ctx)
 		if err != nil {
-			return nil, err
+			return nil, classifyError(err, diag.USER, "")
 		}
 		subscriptions := make([]string, 0)
 		for res.NotDone() {
 			for _, sub := range res.Values() {
-				subscriptions = append(subscriptions, *sub.SubscriptionID)
+				switch sub.State {
+				case subscription.Disabled:
+					logger.Info("Not fetching from subscription because it is disabled", "subscription", *sub.SubscriptionID)
+				case subscription.Deleted:
+					logger.Info("Not fetching from subscription because it is deleted", "subscription", *sub.SubscriptionID)
+				default:
+					subscriptions = append(subscriptions, *sub.SubscriptionID)
+				}
 			}
 			err := res.NextWithContext(ctx)
 			if err != nil {
-				return nil, err
+				return nil, classifyError(err, diag.INTERNAL, "")
 			}
 		}
 		client.subscriptions = subscriptions
 		logger.Info("No subscriptions specified going to using all available ones", "subscriptions", subscriptions)
 	}
+
+	if len(client.subscriptions) == 0 {
+		return nil, diag.FromError(errors.New("could not find any subscription"), diag.USER)
+	}
+
 	for _, sub := range client.subscriptions {
-		client.SetSubscriptionServices(sub, services.InitServices(sub, azureAuth))
+		svcs, err := services.InitServices(sub, azureAuth)
+		if err != nil {
+			return nil, classifyError(err, diag.INTERNAL, sub)
+		}
+		client.SetSubscriptionServices(sub, svcs)
 	}
 
 	// Return the initialized client and it will be passed to your resources

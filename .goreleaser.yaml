@@ -1,3 +1,4 @@
+# DONT EDIT. This file is synced from https://github.com/cloudquery/.github
 before:
   hooks:
     - go mod download
@@ -8,7 +9,7 @@ builds:
       - CGO_ENABLED=0
       - GO111MODULE=on
     ldflags:
-      - -s -w -X github.com/cloudquery/cq-provider-azure/resources.Version={{.Version}}
+      - -s -w -X github.com/cloudquery/cq-provider-azure/resources/provider.Version={{.Version}}
     goos:
       - windows
       - linux
@@ -17,8 +18,8 @@ builds:
       - amd64
       - arm64
     ignore:
-       - goos: windows
-         goarch: arm64
+      - goos: windows
+        goarch: arm64
 archives:
   - name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
     format: binary
@@ -38,3 +39,6 @@ signs:
       - "${signature}"
       - "--detach-sign"
       - "${artifact}"
+
+release:
+  prerelease: auto

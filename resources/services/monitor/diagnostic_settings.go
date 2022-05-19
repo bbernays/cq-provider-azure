@@ -8,17 +8,21 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2021-07-01-preview/insights"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
+	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 )
 
 func MonitorDiagnosticSettings() *schema.Table {
 	return &schema.Table{
-		Name:         "azure_monitor_diagnostic_settings",
-		Description:  "DiagnosticSettingsResource the diagnostic setting resource",
-		Resolver:     fetchMonitorDiagnosticSettings,
-		Multiplex:    client.SubscriptionMultiplex,
-		DeleteFilter: client.DeleteSubscriptionFilter,
-		Options:      schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
+		Name:          "azure_monitor_diagnostic_settings",
+		Description:   "DiagnosticSettingsResource the diagnostic setting resource",
+		Resolver:      fetchMonitorDiagnosticSettings,
+		Multiplex:     client.SubscriptionMultiplex,
+		DeleteFilter:  client.DeleteSubscriptionFilter,
+		Options:       schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
+		IgnoreInTests: true,
 		Columns: []schema.Column{
 			{
 				Name:        "subscription_id",
@@ -39,16 +43,18 @@ func MonitorDiagnosticSettings() *schema.Table {
 				Resolver:    schema.PathResolver("DiagnosticSettings.ServiceBusRuleID"),
 			},
 			{
-				Name:        "event_hub_authorization_rule_id",
-				Description: "The resource Id for the event hub authorization rule",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("DiagnosticSettings.EventHubAuthorizationRuleID"),
+				Name:          "event_hub_authorization_rule_id",
+				Description:   "The resource Id for the event hub authorization rule",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("DiagnosticSettings.EventHubAuthorizationRuleID"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "event_hub_name",
-				Description: "The name of the event hub If none is specified, the default event hub will be selected",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("DiagnosticSettings.EventHubName"),
+				Name:          "event_hub_name",
+				Description:   "The name of the event hub If none is specified, the default event hub will be selected",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("DiagnosticSettings.EventHubName"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "workspace_id",
@@ -57,10 +63,11 @@ func MonitorDiagnosticSettings() *schema.Table {
 				Resolver:    schema.PathResolver("DiagnosticSettings.WorkspaceID"),
 			},
 			{
-				Name:        "log_analytics_destination_type",
-				Description: "A string indicating whether the export to Log Analytics should use the default destination type, ie AzureDiagnostics, or use a destination type constructed as follows: <normalized service identity>_<normalized category name> Possible values are: Dedicated and null (null is default)",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("DiagnosticSettings.LogAnalyticsDestinationType"),
+				Name:          "log_analytics_destination_type",
+				Description:   "A string indicating whether the export to Log Analytics should use the default destination type, ie AzureDiagnostics, or use a destination type constructed as follows: <normalized service identity>_<normalized category name> Possible values are: Dedicated and null (null is default)",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("DiagnosticSettings.LogAnalyticsDestinationType"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "id",
@@ -201,7 +208,7 @@ func fetchMonitorDiagnosticSettings(ctx context.Context, meta schema.ClientMeta,
 	monSvc := cl.Services().Monitor.DiagnosticSettings
 	resResponse, err := resSvc.List(ctx, "", "", nil)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	rs := resResponse.Values()
 	ids := make([]string, 0, len(rs))
@@ -209,26 +216,41 @@ func fetchMonitorDiagnosticSettings(ctx context.Context, meta schema.ClientMeta,
 	for _, r := range rs {
 		ids = append(ids, *r.ID)
 	}
-	for _, id := range ids {
-		response, err := monSvc.List(ctx, id)
-		if err != nil {
-			if isResourceTypeNotSupported(err) {
-				continue
+
+	g, _ := errgroup.WithContext(ctx)
+	limiter := semaphore.NewWeighted(10)
+	for _, i := range ids {
+		id := i
+		g.Go(func() error {
+			if err := limiter.Acquire(ctx, 1); err != nil {
+				return err
 			}
-			return err
-		}
-		if response.Value == nil {
-			continue
-		}
-		for _, v := range *response.Value {
-			res <- diagnosticSetting{
-				DiagnosticSettings: v.DiagnosticSettings,
-				ID:                 v.ID,
-				Name:               v.Name,
-				Type:               v.Type,
-				ResourceURI:        id,
+			defer limiter.Release(1)
+			response, err := monSvc.List(ctx, id)
+			if err != nil {
+				if isResourceTypeNotSupported(err) {
+					return nil
+				}
+				return diag.WrapError(err)
 			}
-		}
+			if response.Value == nil {
+				return nil
+			}
+			for _, v := range *response.Value {
+				res <- diagnosticSetting{
+					DiagnosticSettings: v.DiagnosticSettings,
+					ID:                 v.ID,
+					Name:               v.Name,
+					Type:               v.Type,
+					ResourceURI:        id,
+				}
+			}
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
 	}
 
 	return nil

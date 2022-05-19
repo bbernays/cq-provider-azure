@@ -6,6 +6,7 @@ import (
 	"github.com/cloudquery/cq-provider-azure/client/services"
 	"github.com/cloudquery/cq-provider-sdk/logging"
 	"github.com/cloudquery/cq-provider-sdk/provider"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 	providertest "github.com/cloudquery/cq-provider-sdk/provider/testing"
 	"github.com/golang/mock/gomock"
@@ -29,12 +30,12 @@ func AzureMockTestHelper(t *testing.T, table *schema.Table, builder func(*testin
 	cfg := `
 		subscriptions = ["test_sub"]
 	`
-
+	table.IgnoreInTests = false
 	providertest.TestResource(t, providertest.ResourceTestCase{
 		Provider: &provider.Provider{
-			Name:    "aws_mock_test_provider",
+			Name:    "azure_mock_test_provider",
 			Version: "development",
-			Configure: func(logger hclog.Logger, i interface{}) (schema.ClientMeta, error) {
+			Configure: func(logger hclog.Logger, i interface{}) (schema.ClientMeta, diag.Diagnostics) {
 				c := NewAzureClient(logging.New(&hclog.LoggerOptions{
 					Level: hclog.Warn,
 				}), []string{TestSubscriptionID})
@@ -48,9 +49,7 @@ func AzureMockTestHelper(t *testing.T, table *schema.Table, builder func(*testin
 				return &Config{}
 			},
 		},
-		Table:          table,
-		Config:         cfg,
-		SkipEmptyJsonB: options.SkipEmptyJsonB,
+		Config: cfg,
 	})
 }
 
@@ -59,7 +58,7 @@ func AzureTestHelper(t *testing.T, table *schema.Table) {
 
 	providertest.TestResource(t, providertest.ResourceTestCase{
 		Provider: &provider.Provider{
-			Name:      "aws_mock_test_provider",
+			Name:      "azure_mock_test_provider",
 			Version:   "development",
 			Configure: Configure,
 			Config: func() provider.Config {
@@ -69,9 +68,6 @@ func AzureTestHelper(t *testing.T, table *schema.Table) {
 				"test_resource": table,
 			},
 		},
-		Table:         table,
-		Config:        "",
-		SkipEmptyRows: true,
+		Config: "",
 	})
-
 }

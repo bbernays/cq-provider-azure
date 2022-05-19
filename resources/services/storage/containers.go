@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-01-01/storage"
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
 
@@ -34,10 +35,11 @@ func StorageContainers() *schema.Table {
 				Resolver:    schema.ParentIdResolver,
 			},
 			{
-				Name:        "version",
-				Description: "The version of the deleted blob container",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ContainerProperties.Version"),
+				Name:          "version",
+				Description:   "The version of the deleted blob container",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ContainerProperties.Version"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "deleted",
@@ -100,22 +102,25 @@ func StorageContainers() *schema.Table {
 				Resolver:    schema.PathResolver("ContainerProperties.LeaseDuration"),
 			},
 			{
-				Name:        "metadata",
-				Description: "A name-value pair to associate with the container as metadata",
-				Type:        schema.TypeJSON,
-				Resolver:    schema.PathResolver("ContainerProperties.Metadata"),
+				Name:          "metadata",
+				Description:   "A name-value pair to associate with the container as metadata",
+				Type:          schema.TypeJSON,
+				Resolver:      schema.PathResolver("ContainerProperties.Metadata"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "immutability_policy",
-				Description: "The ImmutabilityPolicy property of the container",
-				Type:        schema.TypeJSON,
-				Resolver:    resolveStorageContainerImmutabilityPolicy,
+				Name:          "immutability_policy",
+				Description:   "The ImmutabilityPolicy property of the container",
+				Type:          schema.TypeJSON,
+				Resolver:      resolveStorageContainerImmutabilityPolicy,
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "legal_hold",
-				Description: "The LegalHold property of the container",
-				Type:        schema.TypeJSON,
-				Resolver:    resolveStorageContainerLegalHold,
+				Name:          "legal_hold",
+				Description:   "The LegalHold property of the container",
+				Type:          schema.TypeJSON,
+				Resolver:      resolveStorageContainerLegalHold,
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "has_legal_hold",
@@ -160,18 +165,24 @@ func StorageContainers() *schema.Table {
 func fetchStorageContainers(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().Storage.Containers
 	acc := parent.Item.(storage.Account)
+
+	// Not all storage-account kinds support containers.
+	if !isBlobSupported(&acc) {
+		return nil
+	}
+
 	resourceDetails, err := client.ParseResourceID(*acc.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	response, err := svc.List(ctx, resourceDetails.ResourceGroup, *acc.Name, "", "", "")
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for response.NotDone() {
 		res <- response.Values()
 		if err := response.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -184,7 +195,7 @@ func resolveStorageContainerImmutabilityPolicy(_ context.Context, _ schema.Clien
 	}
 	data, err := container.ImmutabilityPolicy.MarshalJSON()
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	return resource.Set("immutability_policy", data)
 }
@@ -196,7 +207,7 @@ func resolveStorageContainerLegalHold(_ context.Context, _ schema.ClientMeta, re
 	}
 	data, err := container.LegalHold.MarshalJSON()
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	return resource.Set("legal_hold", data)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-01-01/storage"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 	"github.com/tombuildsstuff/giovanni/storage/2020-08-04/blob/accounts"
 )
@@ -45,16 +46,18 @@ func StorageAccounts() *schema.Table {
 				Type:        schema.TypeString,
 			},
 			{
-				Name:        "identity_principal_id",
-				Description: "The principal ID of resource identity",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("Identity.PrincipalID"),
+				Name:          "identity_principal_id",
+				Description:   "The principal ID of resource identity",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("Identity.PrincipalID"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "identity_tenant_id",
-				Description: "The tenant ID of resource",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("Identity.TenantID"),
+				Name:          "identity_tenant_id",
+				Description:   "The tenant ID of resource",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("Identity.TenantID"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "identity_type",
@@ -105,64 +108,74 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.Dfs"),
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_blob",
-				Description: "Gets the blob endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Blob"),
+				Name:          "primary_endpoints_microsoft_endpoints_blob",
+				Description:   "Gets the blob endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Blob"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_queue",
-				Description: "Gets the queue endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Queue"),
+				Name:          "primary_endpoints_microsoft_endpoints_queue",
+				Description:   "Gets the queue endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Queue"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_table",
-				Description: "Gets the table endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Table"),
+				Name:          "primary_endpoints_microsoft_endpoints_table",
+				Description:   "Gets the table endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Table"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_file",
-				Description: "Gets the file endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.File"),
+				Name:          "primary_endpoints_microsoft_endpoints_file",
+				Description:   "Gets the file endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.File"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_web",
-				Description: "Gets the web endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Web"),
+				Name:          "primary_endpoints_microsoft_endpoints_web",
+				Description:   "Gets the web endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Web"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_microsoft_endpoints_dfs",
-				Description: "Gets the dfs endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Dfs"),
+				Name:          "primary_endpoints_microsoft_endpoints_dfs",
+				Description:   "Gets the dfs endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.MicrosoftEndpoints.Dfs"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_internet_endpoints_blob",
-				Description: "Gets the blob endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Blob"),
+				Name:          "primary_endpoints_internet_endpoints_blob",
+				Description:   "Gets the blob endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Blob"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_internet_endpoints_file",
-				Description: "Gets the file endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.File"),
+				Name:          "primary_endpoints_internet_endpoints_file",
+				Description:   "Gets the file endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.File"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_internet_endpoints_web",
-				Description: "Gets the web endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Web"),
+				Name:          "primary_endpoints_internet_endpoints_web",
+				Description:   "Gets the web endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Web"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "primary_endpoints_internet_endpoints_dfs",
-				Description: "Gets the dfs endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Dfs"),
+				Name:          "primary_endpoints_internet_endpoints_dfs",
+				Description:   "Gets the dfs endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.PrimaryEndpoints.InternetEndpoints.Dfs"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "primary_location",
@@ -183,10 +196,11 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.LastGeoFailoverTime.Time"),
 			},
 			{
-				Name:        "secondary_location",
-				Description: "Gets the location of the geo-replicated secondary for the storage account Only available if the accountType is Standard_GRS or Standard_RAGRS",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryLocation"),
+				Name:          "secondary_location",
+				Description:   "Gets the location of the geo-replicated secondary for the storage account Only available if the accountType is Standard_GRS or Standard_RAGRS",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryLocation"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "status_of_secondary",
@@ -201,112 +215,130 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.CreationTime.Time"),
 			},
 			{
-				Name:        "custom_domain_name",
-				Description: "Gets or sets the custom domain name assigned to the storage account Name is the CNAME source",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.CustomDomain.Name"),
+				Name:          "custom_domain_name",
+				Description:   "Gets or sets the custom domain name assigned to the storage account Name is the CNAME source",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.CustomDomain.Name"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "custom_domain_use_sub_domain_name",
-				Description: "Indicates whether indirect CName validation is enabled Default value is false This should only be set on updates",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.CustomDomain.UseSubDomainName"),
+				Name:          "custom_domain_use_sub_domain_name",
+				Description:   "Indicates whether indirect CName validation is enabled Default value is false This should only be set on updates",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.CustomDomain.UseSubDomainName"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_blob",
-				Description: "Gets the blob endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.Blob"),
+				Name:          "secondary_endpoints_blob",
+				Description:   "Gets the blob endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.Blob"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_queue",
-				Description: "Gets the queue endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.Queue"),
+				Name:          "secondary_endpoints_queue",
+				Description:   "Gets the queue endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.Queue"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_table",
-				Description: "Gets the table endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.Table"),
+				Name:          "secondary_endpoints_table",
+				Description:   "Gets the table endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.Table"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_file",
-				Description: "Gets the file endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.File"),
+				Name:          "secondary_endpoints_file",
+				Description:   "Gets the file endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.File"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_web",
-				Description: "Gets the web endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.Web"),
+				Name:          "secondary_endpoints_web",
+				Description:   "Gets the web endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.Web"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_dfs",
-				Description: "Gets the dfs endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.Dfs"),
+				Name:          "secondary_endpoints_dfs",
+				Description:   "Gets the dfs endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.Dfs"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_blob",
-				Description: "Gets the blob endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Blob"),
+				Name:          "secondary_endpoints_microsoft_endpoints_blob",
+				Description:   "Gets the blob endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Blob"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_queue",
-				Description: "Gets the queue endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Queue"),
+				Name:          "secondary_endpoints_microsoft_endpoints_queue",
+				Description:   "Gets the queue endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Queue"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_table",
-				Description: "Gets the table endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Table"),
+				Name:          "secondary_endpoints_microsoft_endpoints_table",
+				Description:   "Gets the table endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Table"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_file",
-				Description: "Gets the file endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.File"),
+				Name:          "secondary_endpoints_microsoft_endpoints_file",
+				Description:   "Gets the file endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.File"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_web",
-				Description: "Gets the web endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Web"),
+				Name:          "secondary_endpoints_microsoft_endpoints_web",
+				Description:   "Gets the web endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Web"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_microsoft_endpoints_dfs",
-				Description: "Gets the dfs endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Dfs"),
+				Name:          "secondary_endpoints_microsoft_endpoints_dfs",
+				Description:   "Gets the dfs endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.MicrosoftEndpoints.Dfs"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_internet_endpoints_blob",
-				Description: "Gets the blob endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Blob"),
+				Name:          "secondary_endpoints_internet_endpoints_blob",
+				Description:   "Gets the blob endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Blob"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_internet_endpoints_file",
-				Description: "Gets the file endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.File"),
+				Name:          "secondary_endpoints_internet_endpoints_file",
+				Description:   "Gets the file endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.File"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_internet_endpoints_web",
-				Description: "Gets the web endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Web"),
+				Name:          "secondary_endpoints_internet_endpoints_web",
+				Description:   "Gets the web endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Web"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "secondary_endpoints_internet_endpoints_dfs",
-				Description: "Gets the dfs endpoint",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Dfs"),
+				Name:          "secondary_endpoints_internet_endpoints_dfs",
+				Description:   "Gets the dfs endpoint",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.SecondaryEndpoints.InternetEndpoints.Dfs"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "encryption_services_blob_enabled",
@@ -345,10 +377,11 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.Encryption.Services.File.KeyType"),
 			},
 			{
-				Name:        "encryption_services_table_enabled",
-				Description: "A boolean indicating whether or not the service encrypts the data as it is stored",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.Services.Table.Enabled"),
+				Name:          "encryption_services_table_enabled",
+				Description:   "A boolean indicating whether or not the service encrypts the data as it is stored",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.Services.Table.Enabled"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "encryption_services_table_last_enabled_time",
@@ -363,10 +396,11 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.Encryption.Services.Table.KeyType"),
 			},
 			{
-				Name:        "encryption_services_queue_enabled",
-				Description: "A boolean indicating whether or not the service encrypts the data as it is stored",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.Services.Queue.Enabled"),
+				Name:          "encryption_services_queue_enabled",
+				Description:   "A boolean indicating whether or not the service encrypts the data as it is stored",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.Services.Queue.Enabled"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "encryption_services_queue_last_enabled_time",
@@ -387,34 +421,39 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.Encryption.KeySource"),
 			},
 			{
-				Name:        "encryption_require_infrastructure_encryption",
-				Description: "A boolean indicating whether or not the service applies a secondary layer of encryption with platform managed keys for data at rest",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.RequireInfrastructureEncryption"),
+				Name:          "encryption_require_infrastructure_encryption",
+				Description:   "A boolean indicating whether or not the service applies a secondary layer of encryption with platform managed keys for data at rest",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.RequireInfrastructureEncryption"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "encryption_key_vault_properties_key_name",
-				Description: "The name of KeyVault key",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyName"),
+				Name:          "encryption_key_vault_properties_key_name",
+				Description:   "The name of KeyVault key",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyName"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "encryption_key_vault_properties_key_version",
-				Description: "The version of KeyVault key",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyVersion"),
+				Name:          "encryption_key_vault_properties_key_version",
+				Description:   "The version of KeyVault key",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyVersion"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "encryption_key_vault_properties_key_vault_uri",
-				Description: "The Uri of KeyVault",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyVaultURI"),
+				Name:          "encryption_key_vault_properties_key_vault_uri",
+				Description:   "The Uri of KeyVault",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.KeyVaultURI"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "encryption_key_current_versioned_key_identifier",
-				Description: "The object identifier of the current versioned Key Vault Key in use",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.CurrentVersionedKeyIdentifier"),
+				Name:          "encryption_key_current_versioned_key_identifier",
+				Description:   "The object identifier of the current versioned Key Vault Key in use",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.Encryption.KeyVaultProperties.CurrentVersionedKeyIdentifier"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "encryption_key_last_key_rotation_timestamp_time",
@@ -435,40 +474,46 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions"),
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_domain_name",
-				Description: "Specifies the primary domain that the AD DNS server is authoritative for",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainName"),
+				Name:          "files_identity_auth_ad_properties_domain_name",
+				Description:   "Specifies the primary domain that the AD DNS server is authoritative for",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainName"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_net_bios_domain_name",
-				Description: "Specifies the NetBIOS domain name",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.NetBiosDomainName"),
+				Name:          "files_identity_auth_ad_properties_net_bios_domain_name",
+				Description:   "Specifies the NetBIOS domain name",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.NetBiosDomainName"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_forest_name",
-				Description: "Specifies the Active Directory forest to get",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.ForestName"),
+				Name:          "files_identity_auth_ad_properties_forest_name",
+				Description:   "Specifies the Active Directory forest to get",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.ForestName"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_domain_guid",
-				Description: "Specifies the domain GUID",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainGUID"),
+				Name:          "files_identity_auth_ad_properties_domain_guid",
+				Description:   "Specifies the domain GUID",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainGUID"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_net_bios_domain_sid",
-				Description: "Specifies the security identifier (SID)",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainSid"),
+				Name:          "files_identity_auth_ad_properties_net_bios_domain_sid",
+				Description:   "Specifies the security identifier (SID)",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.DomainSid"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "files_identity_auth_ad_properties_azure_storage_sid",
-				Description: "Specifies the security identifier (SID) for Azure Storage",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.AzureStorageSid"),
+				Name:          "files_identity_auth_ad_properties_azure_storage_sid",
+				Description:   "Specifies the security identifier (SID) for Azure Storage",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.AzureStorageSid"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "enable_https_traffic_only",
@@ -489,10 +534,11 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.NetworkRuleSet.DefaultAction"),
 			},
 			{
-				Name:        "is_hns_enabled",
-				Description: "Account HierarchicalNamespace enabled if sets to true",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.IsHnsEnabled"),
+				Name:          "is_hns_enabled",
+				Description:   "Account HierarchicalNamespace enabled if sets to true",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.IsHnsEnabled"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "geo_replication_stats_status",
@@ -507,16 +553,18 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.GeoReplicationStats.LastSyncTime.Time"),
 			},
 			{
-				Name:        "geo_replication_stats_can_failover",
-				Description: "A boolean flag which indicates whether or not account failover is supported for the account",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.GeoReplicationStats.CanFailover"),
+				Name:          "geo_replication_stats_can_failover",
+				Description:   "A boolean flag which indicates whether or not account failover is supported for the account",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.GeoReplicationStats.CanFailover"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "failover_in_progress",
-				Description: "If the failover is in progress, the value will be true, otherwise, it will be null",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.FailoverInProgress"),
+				Name:          "failover_in_progress",
+				Description:   "If the failover is in progress, the value will be true, otherwise, it will be null",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.FailoverInProgress"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "large_file_shares_state",
@@ -531,16 +579,18 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.RoutingPreference.RoutingChoice"),
 			},
 			{
-				Name:        "routing_preference_publish_microsoft_endpoints",
-				Description: "A boolean flag which indicates whether microsoft routing storage endpoints are to be published",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.RoutingPreference.PublishMicrosoftEndpoints"),
+				Name:          "routing_preference_publish_microsoft_endpoints",
+				Description:   "A boolean flag which indicates whether microsoft routing storage endpoints are to be published",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.RoutingPreference.PublishMicrosoftEndpoints"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "routing_preference_publish_internet_endpoints",
-				Description: "A boolean flag which indicates whether internet routing storage endpoints are to be published",
-				Type:        schema.TypeBool,
-				Resolver:    schema.PathResolver("AccountProperties.RoutingPreference.PublishInternetEndpoints"),
+				Name:          "routing_preference_publish_internet_endpoints",
+				Description:   "A boolean flag which indicates whether internet routing storage endpoints are to be published",
+				Type:          schema.TypeBool,
+				Resolver:      schema.PathResolver("AccountProperties.RoutingPreference.PublishInternetEndpoints"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "blob_restore_status",
@@ -549,16 +599,18 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.BlobRestoreStatus.Status"),
 			},
 			{
-				Name:        "blob_restore_status_failure_reason",
-				Description: "Failure reason when blob restore is failed",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.BlobRestoreStatus.FailureReason"),
+				Name:          "blob_restore_status_failure_reason",
+				Description:   "Failure reason when blob restore is failed",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.BlobRestoreStatus.FailureReason"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "blob_restore_status_restore_id",
-				Description: "Id for tracking blob restore request",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("AccountProperties.BlobRestoreStatus.RestoreID"),
+				Name:          "blob_restore_status_restore_id",
+				Description:   "Id for tracking blob restore request",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("AccountProperties.BlobRestoreStatus.RestoreID"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "blob_restore_status_parameters_time_to_restore_time",
@@ -567,10 +619,11 @@ func StorageAccounts() *schema.Table {
 				Resolver:    schema.PathResolver("AccountProperties.BlobRestoreStatus.Parameters.TimeToRestore.Time"),
 			},
 			{
-				Name:        "blob_restore_status_parameters_blob_ranges",
-				Description: "Blob ranges to restore",
-				Type:        schema.TypeJSON,
-				Resolver:    resolveStorageAccountBlobRestoreStatusParametersBlobRanges,
+				Name:          "blob_restore_status_parameters_blob_ranges",
+				Description:   "Blob ranges to restore",
+				Type:          schema.TypeJSON,
+				Resolver:      resolveStorageAccountBlobRestoreStatusParametersBlobRanges,
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "allow_blob_public_access",
@@ -613,22 +666,23 @@ func StorageAccounts() *schema.Table {
 			{
 				Name:        "blob_logging_settings",
 				Type:        schema.TypeJSON,
-				Description: "BLOB service loggging settings",
+				Description: "BLOB service loggging settings (only for storage account types that support blobs)",
 				Resolver:    fetchStorageAccountBlobLoggingSettings,
 			},
 			{
 				Name:        "queue_logging_settings",
 				Type:        schema.TypeJSON,
-				Description: "Queue service loggging settings",
+				Description: "Queue service loggging settings (only for storage account types that support queues)",
 				Resolver:    fetchStorageAccountQueueLoggingSettings,
 			},
 		},
 		Relations: []*schema.Table{
 			{
-				Name:        "azure_storage_account_network_rule_set_virtual_network_rules",
-				Description: "VirtualNetworkRule virtual Network rule. ",
-				Resolver:    fetchStorageAccountNetworkRuleSetVirtualNetworkRules,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "virtual_network_resource_id"}},
+				Name:          "azure_storage_account_network_rule_set_virtual_network_rules",
+				Description:   "VirtualNetworkRule virtual Network rule. ",
+				Resolver:      fetchStorageAccountNetworkRuleSetVirtualNetworkRules,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "virtual_network_resource_id"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "account_cq_id",
@@ -655,10 +709,11 @@ func StorageAccounts() *schema.Table {
 				},
 			},
 			{
-				Name:        "azure_storage_account_network_rule_set_ip_rules",
-				Description: "IPRule IP rule with specific IP or IP range in CIDR format. ",
-				Resolver:    fetchStorageAccountNetworkRuleSetIpRules,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "ip_address_or_range"}},
+				Name:          "azure_storage_account_network_rule_set_ip_rules",
+				Description:   "IPRule IP rule with specific IP or IP range in CIDR format. ",
+				Resolver:      fetchStorageAccountNetworkRuleSetIpRules,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "ip_address_or_range"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "account_cq_id",
@@ -680,10 +735,11 @@ func StorageAccounts() *schema.Table {
 				},
 			},
 			{
-				Name:        "azure_storage_account_private_endpoint_connections",
-				Description: "Azure storage account private endpoint connection",
-				Resolver:    fetchStorageAccountPrivateEndpointConnections,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "id"}},
+				Name:          "azure_storage_account_private_endpoint_connections",
+				Description:   "Azure storage account private endpoint connection",
+				Resolver:      fetchStorageAccountPrivateEndpointConnections,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "id"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "account_cq_id",
@@ -752,12 +808,12 @@ func fetchStorageAccounts(ctx context.Context, meta schema.ClientMeta, _ *schema
 	svc := meta.(*client.Client).Services().Storage.Accounts
 	response, err := svc.List(ctx)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for response.NotDone() {
 		res <- response.Values()
 		if err := response.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -769,7 +825,7 @@ func resolveStorageAccountBlobRestoreStatusParametersBlobRanges(_ context.Contex
 	}
 	data, err := json.Marshal(account.BlobRestoreStatus.Parameters.BlobRanges)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	return resource.Set("blob_restore_status_parameters_blob_ranges", data)
 }
@@ -797,20 +853,30 @@ func fetchStorageAccountPrivateEndpointConnections(_ context.Context, _ schema.C
 	res <- *account.PrivateEndpointConnections
 	return nil
 }
+
 func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
 	acc, ok := resource.Item.(storage.Account)
 	if !ok {
 		return fmt.Errorf("not a storage.Account: %T", resource.Item)
 	}
+
+	if !isBlobSupported(&acc) {
+		return nil
+	}
+
 	// fetch storage account keys for Shared Key authentication
 	storage := meta.(*client.Client).Services().Storage
 	details, err := client.ParseResourceID(*acc.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	keysResult, err := storage.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
 	if err != nil {
-		return err
+		if client.IgnoreAccessDenied(err) {
+			meta.Logger().Warn("received access denied on Accounts.ListKeys", "resource_group", details.ResourceGroup, "account", *acc.Name, "err", err)
+			return nil
+		}
+		return diag.WrapError(err)
 	}
 	if keysResult.Keys == nil || len(*keysResult.Keys) == 0 {
 		return nil
@@ -819,12 +885,18 @@ func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.Cli
 	// use account key to create a new authorizer and then fetch service properties
 	auth, err := autorest.NewSharedKeyAuthorizer(*acc.Name, *(*keysResult.Keys)[0].Value, autorest.SharedKeyLite)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	blobProps := storage.NewBlobServiceProperties(auth)
 	result, err := blobProps.GetServiceProperties(ctx, *acc.Name)
 	if err != nil {
-		return err
+		// For premium 'page blob' storage accounts, we sometimes get "authorization error", not sure why.
+		// In any case, we can probably ignore this since it only happens for premium 'page blob' storage accounts.
+		if client.IgnoreAccessDenied(err) {
+			meta.Logger().Warn("received access denied on GetServiceProperties", "resource_group", details.ResourceGroup, "account", *acc.Name, "err", err)
+			return nil
+		}
+		return diag.WrapError(err)
 	}
 	var logging *accounts.Logging
 	if result.StorageServiceProperties != nil {
@@ -832,24 +904,33 @@ func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.Cli
 	}
 	data, err := json.Marshal(logging)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	return resource.Set(c.Name, data)
 }
+
 func fetchStorageAccountQueueLoggingSettings(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
 	acc, ok := resource.Item.(storage.Account)
 	if !ok {
 		return fmt.Errorf("not a storage.Account: %T", resource.Item)
 	}
+
+	if !isQueueSupported(&acc) {
+		return nil
+	}
+
 	// fetch storage account keys for Shared Key authentication
 	storage := meta.(*client.Client).Services().Storage
 	details, err := client.ParseResourceID(*acc.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	keysResult, err := storage.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
 	if err != nil {
-		return err
+		if client.IgnoreAccessDenied(err) {
+			meta.Logger().Warn("received access denied on Accounts.ListKeys", "resource_group", details.ResourceGroup, "account", *acc.Name, "err", err)
+			return nil
+		}
 	}
 	if keysResult.Keys == nil || len(*keysResult.Keys) == 0 {
 		return nil
@@ -858,16 +939,28 @@ func fetchStorageAccountQueueLoggingSettings(ctx context.Context, meta schema.Cl
 	// use account key to create a new authorizer and then fetch service properties
 	auth, err := autorest.NewSharedKeyAuthorizer(*acc.Name, *(*keysResult.Keys)[0].Value, autorest.SharedKeyLite)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	blobProps := storage.NewQueueServiceProperties(auth)
 	result, err := blobProps.GetServiceProperties(ctx, *acc.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	data, err := json.Marshal(result.Logging)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	return resource.Set(c.Name, data)
+}
+
+// isQueueSupported checks whether queues are supported for a storage account.
+// Premium storage accounts don't support queues.
+func isQueueSupported(account *storage.Account) bool {
+	return account.Sku.Tier == storage.Standard && account.Kind == storage.StorageV2
+}
+
+// isBlobSupported checks whether blobs are supported for a storage account.
+func isBlobSupported(account *storage.Account) bool {
+	return (account.Kind == storage.Storage) || (account.Kind == storage.StorageV2) ||
+		(account.Kind == storage.BlockBlobStorage) || (account.Kind == storage.BlobStorage)
 }

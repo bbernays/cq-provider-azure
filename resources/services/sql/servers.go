@@ -6,6 +6,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/v4.0/sql"
 	"github.com/cloudquery/cq-provider-azure/client"
+
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
 
@@ -25,10 +27,11 @@ func SQLServers() *schema.Table {
 				Resolver:    client.ResolveAzureSubscription,
 			},
 			{
-				Name:        "identity_principal_id",
-				Description: "The Azure Active Directory principal id",
-				Type:        schema.TypeUUID,
-				Resolver:    schema.PathResolver("Identity.PrincipalID"),
+				Name:          "identity_principal_id",
+				Description:   "The Azure Active Directory principal id",
+				Type:          schema.TypeUUID,
+				Resolver:      schema.PathResolver("Identity.PrincipalID"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "identity_type",
@@ -37,10 +40,11 @@ func SQLServers() *schema.Table {
 				Resolver:    schema.PathResolver("Identity.Type"),
 			},
 			{
-				Name:        "identity_tenant_id",
-				Description: "The Azure Active Directory tenant id",
-				Type:        schema.TypeUUID,
-				Resolver:    schema.PathResolver("Identity.TenantID"),
+				Name:          "identity_tenant_id",
+				Description:   "The Azure Active Directory tenant id",
+				Type:          schema.TypeUUID,
+				Resolver:      schema.PathResolver("Identity.TenantID"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "kind",
@@ -54,10 +58,11 @@ func SQLServers() *schema.Table {
 				Resolver:    schema.PathResolver("ServerProperties.AdministratorLogin"),
 			},
 			{
-				Name:        "administrator_login_password",
-				Description: "The administrator login password (required for server creation)",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ServerProperties.AdministratorLoginPassword"),
+				Name:          "administrator_login_password",
+				Description:   "The administrator login password (required for server creation)",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ServerProperties.AdministratorLoginPassword"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "version",
@@ -78,10 +83,11 @@ func SQLServers() *schema.Table {
 				Resolver:    schema.PathResolver("ServerProperties.FullyQualifiedDomainName"),
 			},
 			{
-				Name:        "minimal_tls_version",
-				Description: "Minimal TLS version Allowed values: '10', '11', '12'",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ServerProperties.MinimalTLSVersion"),
+				Name:          "minimal_tls_version",
+				Description:   "Minimal TLS version Allowed values: '10', '11', '12'",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ServerProperties.MinimalTLSVersion"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "public_network_access",
@@ -117,13 +123,14 @@ func SQLServers() *schema.Table {
 			},
 		},
 		Relations: []*schema.Table{
-			SQLDatabases(),
+			SqlDatabases(),
 			SQLServerEncryptionProtectors(),
 			{
-				Name:        "azure_sql_server_private_endpoint_connections",
-				Description: "List of private endpoint connections on a server",
-				Resolver:    fetchSqlServerPrivateEndpointConnections,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				Name:          "azure_sql_server_private_endpoint_connections",
+				Description:   "List of private endpoint connections on a server",
+				Resolver:      fetchSqlServerPrivateEndpointConnections,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -170,10 +177,11 @@ func SQLServers() *schema.Table {
 				},
 			},
 			{
-				Name:        "azure_sql_server_firewall_rules",
-				Description: "The list of server firewall rules.",
-				Resolver:    fetchSqlServerFirewallRules,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				Name:          "azure_sql_server_firewall_rules",
+				Description:   "The list of server firewall rules.",
+				Resolver:      fetchSqlServerFirewallRules,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -222,10 +230,11 @@ func SQLServers() *schema.Table {
 				},
 			},
 			{
-				Name:        "azure_sql_server_admins",
-				Description: "ServerAzureADAdministrator azure Active Directory administrator",
-				Resolver:    fetchSqlServerAdmins,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				Name:          "azure_sql_server_admins",
+				Description:   "ServerAzureADAdministrator azure Active Directory administrator",
+				Resolver:      fetchSqlServerAdmins,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -306,10 +315,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.PathResolver("ServerBlobAuditingPolicyProperties.StorageEndpoint"),
 					},
 					{
-						Name:        "storage_account_access_key",
-						Description: "Specifies the identifier key of the auditing storage account.",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("ServerBlobAuditingPolicyProperties.StorageAccountAccessKey"),
+						Name:          "storage_account_access_key",
+						Description:   "Specifies the identifier key of the auditing storage account.",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("ServerBlobAuditingPolicyProperties.StorageAccountAccessKey"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "retention_days",
@@ -342,10 +352,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.PathResolver("ServerBlobAuditingPolicyProperties.IsAzureMonitorTargetEnabled"),
 					},
 					{
-						Name:        "queue_delay_ms",
-						Description: "Specifies the amount of time in milliseconds that can elapse before audit actions are forced to be processed.",
-						Type:        schema.TypeInt,
-						Resolver:    schema.PathResolver("ServerBlobAuditingPolicyProperties.QueueDelayMs"),
+						Name:          "queue_delay_ms",
+						Description:   "Specifies the amount of time in milliseconds that can elapse before audit actions are forced to be processed.",
+						Type:          schema.TypeInt,
+						Resolver:      schema.PathResolver("ServerBlobAuditingPolicyProperties.QueueDelayMs"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "id",
@@ -378,10 +389,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.ParentIdResolver,
 					},
 					{
-						Name:        "created_by",
-						Description: "A string identifier for the identity that created the resource",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("SystemData.CreatedBy"),
+						Name:          "created_by",
+						Description:   "A string identifier for the identity that created the resource",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("SystemData.CreatedBy"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "created_by_type",
@@ -396,10 +408,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.PathResolver("SystemData.CreatedAt.Time"),
 					},
 					{
-						Name:        "last_modified_by",
-						Description: "A string identifier for the identity that last modified the resource",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("SystemData.LastModifiedBy"),
+						Name:          "last_modified_by",
+						Description:   "A string identifier for the identity that last modified the resource",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("SystemData.LastModifiedBy"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "last_modified_by_type",
@@ -432,10 +445,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.PathResolver("ServerDevOpsAuditSettingsProperties.StorageEndpoint"),
 					},
 					{
-						Name:        "storage_account_access_key",
-						Description: "Specifies the identifier key of the auditing storage account.",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("ServerDevOpsAuditSettingsProperties.StorageAccountAccessKey"),
+						Name:          "storage_account_access_key",
+						Description:   "Specifies the identifier key of the auditing storage account.",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("ServerDevOpsAuditSettingsProperties.StorageAccountAccessKey"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "storage_account_subscription_id",
@@ -474,22 +488,25 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.ParentIdResolver,
 					},
 					{
-						Name:        "storage_container_path",
-						Description: "A blob storage container path to hold the scan results.",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageContainerPath"),
+						Name:          "storage_container_path",
+						Description:   "A blob storage container path to hold the scan results.",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageContainerPath"),
+						IgnoreInTests: true,
 					},
 					{
-						Name:        "storage_container_sas_key",
-						Description: "A shared access signature (SAS Key) that has read and write access to the blob container specified in 'storageContainerPath' parameter.",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageContainerSasKey"),
+						Name:          "storage_container_sas_key",
+						Description:   "A shared access signature (SAS Key) that has read and write access to the blob container specified in 'storageContainerPath' parameter.",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageContainerSasKey"),
+						IgnoreInTests: true,
 					},
 					{
-						Name:        "storage_account_access_key",
-						Description: "Specifies the identifier key of the storage account for vulnerability assessment scan results.",
-						Type:        schema.TypeString,
-						Resolver:    schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageAccountAccessKey"),
+						Name:          "storage_account_access_key",
+						Description:   "Specifies the identifier key of the storage account for vulnerability assessment scan results.",
+						Type:          schema.TypeString,
+						Resolver:      schema.PathResolver("ServerVulnerabilityAssessmentProperties.StorageAccountAccessKey"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "recurring_scans_is_enabled",
@@ -504,10 +521,11 @@ func SQLServers() *schema.Table {
 						Resolver:    schema.PathResolver("ServerVulnerabilityAssessmentProperties.RecurringScans.EmailSubscriptionAdmins"),
 					},
 					{
-						Name:        "recurring_scans_emails",
-						Description: "Specifies an array of e-mail addresses to which the scan notification is sent",
-						Type:        schema.TypeStringArray,
-						Resolver:    schema.PathResolver("ServerVulnerabilityAssessmentProperties.RecurringScans.Emails"),
+						Name:          "recurring_scans_emails",
+						Description:   "Specifies an array of e-mail addresses to which the scan notification is sent",
+						Type:          schema.TypeStringArray,
+						Resolver:      schema.PathResolver("ServerVulnerabilityAssessmentProperties.RecurringScans.Emails"),
+						IgnoreInTests: true,
 					},
 					{
 						Name:        "id",
@@ -527,6 +545,138 @@ func SQLServers() *schema.Table {
 					},
 				},
 			},
+			{
+				Name:          "azure_sql_server_virtual_network_rules",
+				Description:   "List of virtual network for a server",
+				Resolver:      fetchSqlServerVirtualNetworkRules,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				IgnoreInTests: true,
+				Columns: []schema.Column{
+					{
+						Name:        "server_cq_id",
+						Description: "Unique ID of azure_sql_servers table (FK)",
+						Type:        schema.TypeUUID,
+						Resolver:    schema.ParentIdResolver,
+					},
+					{
+						Name:        "id",
+						Description: "Resource ID",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("ID"),
+					},
+					{
+						Name:        "name",
+						Description: "Resource name",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("Name"),
+					},
+					{
+						Name:        "type",
+						Description: "The virtual network rule type",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("Type"),
+					},
+					{
+						Name:        "subnet_id",
+						Description: "The ARM resource id of the virtual network subnet.",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("VirtualNetworkSubnetID"),
+					},
+					{
+						Name:        "ignore_missing_vnet_service_endpoint",
+						Description: "Create firewall rule before the virtual network has vnet service endpoint enabled.",
+						Type:        schema.TypeBool,
+						Resolver:    schema.PathResolver("IgnoreMissingVnetServiceEndpoint"),
+					},
+					{
+						Name:        "state",
+						Description: "Virtual Network Rule State",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("State"),
+					},
+				},
+			},
+			{
+				Name:          "azure_sql_server_security_alert_policy",
+				Description:   "List the server's threat detection policies",
+				Resolver:      fetchSqlServerSecurityAlertPolicies,
+				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
+				IgnoreInTests: false,
+				Columns: []schema.Column{
+					{
+						Name:        "server_cq_id",
+						Description: "Unique ID of azure_sql_servers table (FK)",
+						Type:        schema.TypeUUID,
+						Resolver:    schema.ParentIdResolver,
+					},
+					{
+						Name:        "id",
+						Description: "Resource ID",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("ID"),
+					},
+					{
+						Name:        "name",
+						Description: "Resource name",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("Name"),
+					},
+					{
+						Name:        "type",
+						Description: "The virtual network rule type",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("Type"),
+					},
+					{
+						Name:        "state",
+						Description: "Specifies the state of the policy, whether it is enabled or disabled or a policy has not been applied yet on the specific database. Possible values include: 'SecurityAlertPolicyStateNew', 'SecurityAlertPolicyStateEnabled', 'SecurityAlertPolicyStateDisabled'",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("State"),
+					},
+					{
+						Name:        "disabled_alerts",
+						Description: "Specifies an array of alerts that are disabled. Allowed values are: Sql_Injection, Sql_Injection_Vulnerability, Access_Anomaly, Data_Exfiltration, Unsafe_Action",
+						Type:        schema.TypeStringArray,
+						Resolver:    schema.PathResolver("DisabledAlerts"),
+					},
+					{
+						Name:        "email_addresses",
+						Description: "Specifies an array of e-mail addresses to which the alert is sent.",
+						Type:        schema.TypeStringArray,
+						Resolver:    schema.PathResolver("EmailAddresses"),
+					},
+					{
+						Name:        "email_account_admins",
+						Description: "Specifies that the alert is sent to the account administrators.",
+						Type:        schema.TypeBool,
+						Resolver:    schema.PathResolver("EmailAccountAdmins"),
+					},
+					{
+						Name:        "storage_endpoint",
+						Description: "Specifies the blob storage endpoint (e.g. https://MyAccount.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs.",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("StorageEndpoint"),
+					},
+					{
+						Name:        "storage_account_access_key",
+						Description: "Specifies the identifier key of the Threat Detection audit storage account.",
+						Type:        schema.TypeString,
+						Resolver:    schema.PathResolver("StorageAccountAccessKey"),
+					},
+					{
+						Name:        "retention_days",
+						Description: "Specifies the number of days to keep in the Threat Detection audit logs.",
+						Type:        schema.TypeInt,
+						Resolver:    schema.PathResolver("RetentionDays"),
+					},
+					{
+						Name:        "creation_time",
+						Description: "Specifies the UTC creation time of the policy.",
+						Type:        schema.TypeTimestamp,
+						Resolver:    schema.PathResolver("CreationTime.Time"),
+					},
+				},
+			},
 		},
 	}
 }
@@ -538,12 +688,12 @@ func fetchSqlServers(ctx context.Context, meta schema.ClientMeta, parent *schema
 	svc := meta.(*client.Client).Services().SQL.Servers
 	servers, err := svc.List(ctx)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for servers.NotDone() {
 		res <- servers.Values()
 		if err := servers.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -560,6 +710,29 @@ func fetchSqlServerPrivateEndpointConnections(ctx context.Context, meta schema.C
 	return nil
 }
 
+func fetchSqlServerVirtualNetworkRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+	svc := meta.(*client.Client).Services().SQL.VirtualNetworkRules
+	server, ok := parent.Item.(sql.Server)
+	if !ok {
+		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
+	}
+	details, err := client.ParseResourceID(*server.ID)
+	if err != nil {
+		return diag.WrapError(err)
+	}
+	result, err := svc.ListByServer(ctx, details.ResourceGroup, *server.Name)
+	if err != nil {
+		return diag.WrapError(err)
+	}
+	for result.NotDone() {
+		res <- result.Values()
+		if err := result.NextWithContext(ctx); err != nil {
+			return diag.WrapError(err)
+		}
+	}
+	return nil
+}
+
 func fetchSqlServerFirewallRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().SQL.Firewall
 	server, ok := parent.Item.(sql.Server)
@@ -568,11 +741,11 @@ func fetchSqlServerFirewallRules(ctx context.Context, meta schema.ClientMeta, pa
 	}
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	result, err := svc.ListByServer(ctx, details.ResourceGroup, *server.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	if result.Value != nil {
 		res <- *result.Value
@@ -588,16 +761,16 @@ func fetchSqlServerAdmins(ctx context.Context, meta schema.ClientMeta, parent *s
 	}
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	result, err := svc.ListByServer(ctx, details.ResourceGroup, *server.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for result.NotDone() {
 		res <- result.Values()
 		if err := result.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -628,16 +801,16 @@ func fetchSqlServerDevopsAuditSettings(ctx context.Context, meta schema.ClientMe
 	s := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*s.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	result, err := svc.ListByServer(ctx, details.ResourceGroup, *s.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for result.NotDone() {
 		res <- result.Values()
 		if err := result.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -648,16 +821,39 @@ func fetchSqlServerVulnerabilityAssessments(ctx context.Context, meta schema.Cli
 	s := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*s.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	result, err := svc.ListByServer(ctx, details.ResourceGroup, *s.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for result.NotDone() {
 		res <- result.Values()
 		if err := result.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
+		}
+	}
+	return nil
+}
+
+func fetchSqlServerSecurityAlertPolicies(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+	svc := meta.(*client.Client).Services().SQL.ServerSecurityAlertPolicies
+	server, ok := parent.Item.(sql.Server)
+	if !ok {
+		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
+	}
+	details, err := client.ParseResourceID(*server.ID)
+	if err != nil {
+		return diag.WrapError(err)
+	}
+	result, err := svc.ListByServer(ctx, details.ResourceGroup, *server.Name)
+	if err != nil {
+		return diag.WrapError(err)
+	}
+	for result.NotDone() {
+		res <- result.Values()
+		if err = result.NextWithContext(ctx); err != nil {
+			return diag.WrapError(err)
 		}
 	}
 	return nil

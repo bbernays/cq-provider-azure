@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudquery/cq-provider-azure/client"
+	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
 
@@ -29,10 +30,11 @@ func MonitorLogProfiles() *schema.Table {
 				Resolver:    schema.PathResolver("LogProfileProperties.StorageAccountID"),
 			},
 			{
-				Name:        "service_bus_rule_id",
-				Description: "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("LogProfileProperties.ServiceBusRuleID"),
+				Name:          "service_bus_rule_id",
+				Description:   "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("LogProfileProperties.ServiceBusRuleID"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "locations",
@@ -70,19 +72,22 @@ func MonitorLogProfiles() *schema.Table {
 				Type:        schema.TypeString,
 			},
 			{
-				Name:        "type",
-				Description: "Azure resource type",
-				Type:        schema.TypeString,
+				Name:          "type",
+				Description:   "Azure resource type",
+				Type:          schema.TypeString,
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "location",
-				Description: "Resource location",
-				Type:        schema.TypeString,
+				Name:          "location",
+				Description:   "Resource location",
+				Type:          schema.TypeString,
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "tags",
-				Description: "Resource tags",
-				Type:        schema.TypeJSON,
+				Name:          "tags",
+				Description:   "Resource tags",
+				Type:          schema.TypeJSON,
+				IgnoreInTests: true,
 			},
 		},
 	}
@@ -95,7 +100,7 @@ func fetchMonitorLogProfiles(ctx context.Context, meta schema.ClientMeta, parent
 	svc := meta.(*client.Client).Services().Monitor.LogProfiles
 	result, err := svc.List(ctx)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	if result.Value == nil {
 		return nil
