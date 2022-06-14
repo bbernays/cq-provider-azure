@@ -2,7 +2,6 @@ package monitor
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-11-01-preview/insights"
 	"github.com/cloudquery/cq-provider-azure/client"
@@ -75,7 +74,6 @@ func MonitorActivityLogAlerts() *schema.Table {
 				Name:        "azure_monitor_activity_log_alert_conditions",
 				Description: "ActivityLogAlertLeafCondition an Activity Log alert condition that is met by comparing an activity log field and value",
 				Resolver:    fetchMonitorActivityLogAlertConditions,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"activity_log_alert_cq_id", "field"}},
 				Columns: []schema.Column{
 					{
 						Name:        "activity_log_alert_cq_id",
@@ -106,7 +104,6 @@ func MonitorActivityLogAlerts() *schema.Table {
 				Name:        "azure_monitor_activity_log_alert_action_groups",
 				Description: "ActivityLogAlertActionGroup a pointer to an Azure Action Group",
 				Resolver:    fetchMonitorActivityLogAlertActionGroups,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"activity_log_alert_cq_id", "action_group_id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "activity_log_alert_cq_id",
@@ -153,20 +150,14 @@ func fetchMonitorActivityLogAlerts(ctx context.Context, meta schema.ClientMeta, 
 	return nil
 }
 func resolveMonitorActivityLogAlertScopes(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	r, ok := resource.Item.(insights.ActivityLogAlertResource)
-	if !ok {
-		return fmt.Errorf("expected to have insights.ActivityLogAlertResource but got %T", resource.Item)
-	}
+	r := resource.Item.(insights.ActivityLogAlertResource)
 	if r.Scopes == nil {
 		return nil
 	}
-	return resource.Set(c.Name, *r.Scopes)
+	return diag.WrapError(resource.Set(c.Name, *r.Scopes))
 }
 func fetchMonitorActivityLogAlertConditions(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(insights.ActivityLogAlertResource)
-	if !ok {
-		return fmt.Errorf("expected to have insights.ActivityLogAlertResource but got %T", parent.Item)
-	}
+	p := parent.Item.(insights.ActivityLogAlertResource)
 	if p.Condition == nil {
 		return nil
 	}
@@ -174,20 +165,14 @@ func fetchMonitorActivityLogAlertConditions(ctx context.Context, meta schema.Cli
 	return nil
 }
 func resolveMonitorActivityLogAlertConditionField(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	r, ok := resource.Item.(insights.ActivityLogAlertLeafCondition)
-	if !ok {
-		return fmt.Errorf("expected to have insights.ActivityLogAlertLeafCondition but got %T", resource.Item)
-	}
+	r := resource.Item.(insights.ActivityLogAlertLeafCondition)
 	if r.Field == nil {
 		return nil
 	}
-	return resource.Set(c.Name, *r.Field)
+	return diag.WrapError(resource.Set(c.Name, *r.Field))
 }
 func fetchMonitorActivityLogAlertActionGroups(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(insights.ActivityLogAlertResource)
-	if !ok {
-		return fmt.Errorf("expected to have insights.ActivityLogAlertResource but got %T", parent.Item)
-	}
+	p := parent.Item.(insights.ActivityLogAlertResource)
 	if p.Actions == nil {
 		return nil
 	}
@@ -195,12 +180,9 @@ func fetchMonitorActivityLogAlertActionGroups(ctx context.Context, meta schema.C
 	return nil
 }
 func resolveMonitorActivityLogAlertActionGroupActionGroupID(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	r, ok := resource.Item.(insights.ActivityLogAlertActionGroup)
-	if !ok {
-		return fmt.Errorf("expected to have insights.ActivityLogAlertActionGroup but got %T", resource.Item)
-	}
+	r := resource.Item.(insights.ActivityLogAlertActionGroup)
 	if r.ActionGroupID == nil {
 		return nil
 	}
-	return resource.Set(c.Name, *r.ActionGroupID)
+	return diag.WrapError(resource.Set(c.Name, *r.ActionGroupID))
 }

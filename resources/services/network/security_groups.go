@@ -75,7 +75,6 @@ func NetworkSecurityGroups() *schema.Table {
 				Name:        "azure_network_security_group_security_rules",
 				Description: "SecurityRule network security rule",
 				Resolver:    fetchNetworkSecurityGroupSecurityRules,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"security_group_cq_id", "id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "security_group_cq_id",
@@ -195,7 +194,6 @@ func NetworkSecurityGroups() *schema.Table {
 				Name:          "azure_network_security_group_flow_logs",
 				Description:   "FlowLog a flow log resource",
 				Resolver:      fetchNetworkSecurityGroupFlowLogs,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"security_group_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -329,7 +327,6 @@ func NetworkSecurityGroups() *schema.Table {
 				Name:        "azure_network_security_group_default_security_rules",
 				Description: "SecurityRule network security rule",
 				Resolver:    fetchNetworkSecurityGroupDefaultSecurityRules,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"security_group_cq_id", "id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "security_group_cq_id",
@@ -466,18 +463,12 @@ func fetchNetworkSecurityGroups(ctx context.Context, meta schema.ClientMeta, par
 	return nil
 }
 func fetchNetworkSecurityGroupSecurityRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(network.SecurityGroup)
-	if !ok {
-		return fmt.Errorf("expected to have network.SecurityGroup but got %T", parent.Item)
-	}
+	p := parent.Item.(network.SecurityGroup)
 	res <- *p.SecurityRules
 	return nil
 }
 func fetchNetworkSecurityGroupFlowLogs(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(network.SecurityGroup)
-	if !ok {
-		return fmt.Errorf("expected to have network.SecurityGroup but got %T", parent.Item)
-	}
+	p := parent.Item.(network.SecurityGroup)
 	///subscriptions/ce681e53-1bc4-4218-b777-ddbfeec1986f/resourceGroups/example-resources/providers/Microsoft.Network/networkWatchers/acctestnw/flowLogs/Microsoft.Networkexample-resourcesacceptanceTestSecurityGroup1test
 	if p.FlowLogs == nil {
 		return nil
@@ -488,7 +479,7 @@ func fetchNetworkSecurityGroupFlowLogs(ctx context.Context, meta schema.ClientMe
 		//parse flow log id and get required fields from it
 		v := strings.Split(*fl.ID, "/")
 		if len(v) != 11 {
-			return fmt.Errorf("wrong format of flow logs id")
+			return diag.WrapError(fmt.Errorf("wrong format of flow logs id"))
 		}
 		networkWatcherName := v[8]
 		resourceGroup := v[4]
@@ -499,11 +490,11 @@ func fetchNetworkSecurityGroupFlowLogs(ctx context.Context, meta schema.ClientMe
 		if err != nil {
 			return diag.WrapError(err)
 		}
-		client, ok := svc.(network.WatchersClient)
+		watchersClient, ok := svc.(network.WatchersClient)
 		if !ok {
-			client = network.WatchersClient{} //use a dummy network.WatchersClient with unit tests
+			watchersClient = network.WatchersClient{} //use a dummy network.WatchersClient with unit tests
 		}
-		properties, err := result.Result(client)
+		properties, err := result.Result(watchersClient)
 		if err != nil {
 			return diag.WrapError(err)
 		}
@@ -528,10 +519,7 @@ func fetchNetworkSecurityGroupFlowLogs(ctx context.Context, meta schema.ClientMe
 	return nil
 }
 func fetchNetworkSecurityGroupDefaultSecurityRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(network.SecurityGroup)
-	if !ok {
-		return fmt.Errorf("expected to have network.SecurityGroup but got %T", parent.Item)
-	}
+	p := parent.Item.(network.SecurityGroup)
 	res <- *p.DefaultSecurityRules
 	return nil
 }

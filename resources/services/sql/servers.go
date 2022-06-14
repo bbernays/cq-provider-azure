@@ -2,11 +2,9 @@ package sql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/v4.0/sql"
 	"github.com/cloudquery/cq-provider-azure/client"
-
 	"github.com/cloudquery/cq-provider-sdk/provider/diag"
 	"github.com/cloudquery/cq-provider-sdk/provider/schema"
 )
@@ -129,7 +127,6 @@ func SQLServers() *schema.Table {
 				Name:          "azure_sql_server_private_endpoint_connections",
 				Description:   "List of private endpoint connections on a server",
 				Resolver:      fetchSqlServerPrivateEndpointConnections,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -180,7 +177,6 @@ func SQLServers() *schema.Table {
 				Name:          "azure_sql_server_firewall_rules",
 				Description:   "The list of server firewall rules.",
 				Resolver:      fetchSqlServerFirewallRules,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -233,7 +229,6 @@ func SQLServers() *schema.Table {
 				Name:          "azure_sql_server_admins",
 				Description:   "ServerAzureADAdministrator azure Active Directory administrator",
 				Resolver:      fetchSqlServerAdmins,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -294,7 +289,6 @@ func SQLServers() *schema.Table {
 				Name:        "azure_sql_server_db_blob_auditing_policies",
 				Description: "Database blob auditing policy",
 				Resolver:    fetchSqlServerDbBlobAuditingPolicies,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -380,7 +374,6 @@ func SQLServers() *schema.Table {
 				Name:        "azure_sql_server_devops_audit_settings",
 				Description: "ServerDevOpsAuditingSettings a server DevOps auditing settings",
 				Resolver:    fetchSqlServerDevopsAuditSettings,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -479,7 +472,6 @@ func SQLServers() *schema.Table {
 				Name:        "azure_sql_server_vulnerability_assessments",
 				Description: "Server vulnerability assessment",
 				Resolver:    fetchSqlServerVulnerabilityAssessments,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				Columns: []schema.Column{
 					{
 						Name:        "server_cq_id",
@@ -549,7 +541,6 @@ func SQLServers() *schema.Table {
 				Name:          "azure_sql_server_virtual_network_rules",
 				Description:   "List of virtual network for a server",
 				Resolver:      fetchSqlServerVirtualNetworkRules,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -600,7 +591,6 @@ func SQLServers() *schema.Table {
 				Name:          "azure_sql_server_security_alert_policy",
 				Description:   "List the server's threat detection policies",
 				Resolver:      fetchSqlServerSecurityAlertPolicies,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"server_cq_id", "id"}},
 				IgnoreInTests: false,
 				Columns: []schema.Column{
 					{
@@ -700,10 +690,7 @@ func fetchSqlServers(ctx context.Context, meta schema.ClientMeta, parent *schema
 }
 
 func fetchSqlServerPrivateEndpointConnections(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	server, ok := parent.Item.(sql.Server)
-	if !ok {
-		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
-	}
+	server := parent.Item.(sql.Server)
 	if server.PrivateEndpointConnections != nil {
 		res <- *server.PrivateEndpointConnections
 	}
@@ -712,10 +699,7 @@ func fetchSqlServerPrivateEndpointConnections(ctx context.Context, meta schema.C
 
 func fetchSqlServerVirtualNetworkRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().SQL.VirtualNetworkRules
-	server, ok := parent.Item.(sql.Server)
-	if !ok {
-		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
-	}
+	server := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
 		return diag.WrapError(err)
@@ -735,10 +719,7 @@ func fetchSqlServerVirtualNetworkRules(ctx context.Context, meta schema.ClientMe
 
 func fetchSqlServerFirewallRules(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().SQL.Firewall
-	server, ok := parent.Item.(sql.Server)
-	if !ok {
-		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
-	}
+	server := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
 		return diag.WrapError(err)
@@ -755,10 +736,7 @@ func fetchSqlServerFirewallRules(ctx context.Context, meta schema.ClientMeta, pa
 
 func fetchSqlServerAdmins(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().SQL.ServerAdmins
-	server, ok := parent.Item.(sql.Server)
-	if !ok {
-		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
-	}
+	server := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
 		return diag.WrapError(err)
@@ -781,16 +759,16 @@ func fetchSqlServerDbBlobAuditingPolicies(ctx context.Context, meta schema.Clien
 	s := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*s.ID)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	result, err := svc.ListByServer(ctx, details.ResourceGroup, *s.Name)
 	if err != nil {
-		return err
+		return diag.WrapError(err)
 	}
 	for result.NotDone() {
 		res <- result.Values()
 		if err := result.NextWithContext(ctx); err != nil {
-			return err
+			return diag.WrapError(err)
 		}
 	}
 	return nil
@@ -838,10 +816,7 @@ func fetchSqlServerVulnerabilityAssessments(ctx context.Context, meta schema.Cli
 
 func fetchSqlServerSecurityAlertPolicies(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	svc := meta.(*client.Client).Services().SQL.ServerSecurityAlertPolicies
-	server, ok := parent.Item.(sql.Server)
-	if !ok {
-		return fmt.Errorf("not an sql.Server instance: %#v", parent.Item)
-	}
+	server := parent.Item.(sql.Server)
 	details, err := client.ParseResourceID(*server.ID)
 	if err != nil {
 		return diag.WrapError(err)

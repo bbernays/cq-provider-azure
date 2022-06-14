@@ -3,7 +3,6 @@ package container
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-03-01/containerservice"
 	"github.com/cloudquery/cq-provider-azure/client"
@@ -467,7 +466,6 @@ func ContainerManagedClusters() *schema.Table {
 				Name:          "azure_container_managed_cluster_pip_user_assigned_id_exceptions",
 				Description:   "ManagedClusterPodIdentityException",
 				Resolver:      fetchContainerManagedClusterPipUserAssignedIdentityExceptions,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"managed_cluster_cq_id", "name"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -497,7 +495,6 @@ func ContainerManagedClusters() *schema.Table {
 				Name:          "azure_container_managed_cluster_private_link_resources",
 				Description:   "PrivateLinkResource a private link resource",
 				Resolver:      fetchContainerManagedClusterPrivateLinkResources,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"managed_cluster_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -545,7 +542,6 @@ func ContainerManagedClusters() *schema.Table {
 				Name:        "azure_container_managed_cluster_agent_pool_profiles",
 				Description: "ManagedClusterAgentPoolProfile profile for the container service agent pool",
 				Resolver:    fetchContainerManagedClusterAgentPoolProfiles,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"managed_cluster_cq_id", "name"}},
 				Columns: []schema.Column{
 					{
 						Name:        "managed_cluster_cq_id",
@@ -832,7 +828,6 @@ func ContainerManagedClusters() *schema.Table {
 				Name:          "azure_container_managed_cluster_pip_user_assigned_identities",
 				Description:   "ManagedClusterPodIdentity",
 				Resolver:      fetchContainerManagedClusterPipUserAssignedIdentities,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"managed_cluster_cq_id", "name"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -904,10 +899,7 @@ func fetchContainerManagedClusters(ctx context.Context, meta schema.ClientMeta, 
 }
 
 func resolveContainerManagedClusterNetworkProfileLoadBalancerOutboundIPPrefixes(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	mc, ok := resource.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", resource.Item)
-	}
+	mc := resource.Item.(containerservice.ManagedCluster)
 	if mc.NetworkProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile.OutboundIPPrefixes == nil ||
@@ -921,14 +913,11 @@ func resolveContainerManagedClusterNetworkProfileLoadBalancerOutboundIPPrefixes(
 			ids = append(ids, *p.ID)
 		}
 	}
-	return resource.Set(c.Name, ids)
+	return diag.WrapError(resource.Set(c.Name, ids))
 }
 
 func resolveContainerManagedClusterNetworkProfileLoadBalancerOutboundIps(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	mc, ok := resource.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", resource.Item)
-	}
+	mc := resource.Item.(containerservice.ManagedCluster)
 	if mc.NetworkProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile.OutboundIPs == nil ||
@@ -942,14 +931,11 @@ func resolveContainerManagedClusterNetworkProfileLoadBalancerOutboundIps(ctx con
 			ids = append(ids, *p.ID)
 		}
 	}
-	return resource.Set(c.Name, ids)
+	return diag.WrapError(resource.Set(c.Name, ids))
 }
 
 func resolveContainerManagedClusterNetworkProfileLoadBalancerEffectiveOutboundIps(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	mc, ok := resource.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", resource.Item)
-	}
+	mc := resource.Item.(containerservice.ManagedCluster)
 	if mc.NetworkProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile == nil ||
 		mc.NetworkProfile.LoadBalancerProfile.EffectiveOutboundIPs == nil {
@@ -962,14 +948,11 @@ func resolveContainerManagedClusterNetworkProfileLoadBalancerEffectiveOutboundIp
 			ids = append(ids, *p.ID)
 		}
 	}
-	return resource.Set(c.Name, ids)
+	return diag.WrapError(resource.Set(c.Name, ids))
 }
 
 func fetchContainerManagedClusterPipUserAssignedIdentityExceptions(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	mc, ok := parent.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", parent.Item)
-	}
+	mc := parent.Item.(containerservice.ManagedCluster)
 	if mc.PodIdentityProfile == nil ||
 		mc.PodIdentityProfile.UserAssignedIdentityExceptions == nil {
 		return nil
@@ -979,10 +962,7 @@ func fetchContainerManagedClusterPipUserAssignedIdentityExceptions(ctx context.C
 }
 
 func fetchContainerManagedClusterPrivateLinkResources(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	mc, ok := parent.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", parent.Item)
-	}
+	mc := parent.Item.(containerservice.ManagedCluster)
 	if mc.PrivateLinkResources == nil {
 		return nil
 	}
@@ -991,10 +971,7 @@ func fetchContainerManagedClusterPrivateLinkResources(ctx context.Context, meta 
 }
 
 func fetchContainerManagedClusterAgentPoolProfiles(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	mc, ok := parent.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", parent.Item)
-	}
+	mc := parent.Item.(containerservice.ManagedCluster)
 	if mc.AgentPoolProfiles == nil {
 		return nil
 	}
@@ -1003,22 +980,16 @@ func fetchContainerManagedClusterAgentPoolProfiles(ctx context.Context, meta sch
 }
 
 func resolveContainerManagedClusterAgentPoolProfileLinuxOsConfig(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	a, ok := resource.Item.(containerservice.ManagedClusterAgentPoolProfile)
-	if !ok {
-		return fmt.Errorf("not an containerservice.ManagedClusterAgentPoolProfile instance: %T", resource.Item)
-	}
+	a := resource.Item.(containerservice.ManagedClusterAgentPoolProfile)
 	out, err := json.Marshal(a.LinuxOSConfig)
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	return resource.Set(c.Name, out)
+	return diag.WrapError(resource.Set(c.Name, out))
 }
 
 func fetchContainerManagedClusterPipUserAssignedIdentities(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	mc, ok := parent.Item.(containerservice.ManagedCluster)
-	if !ok {
-		return fmt.Errorf("not a containerservice.ManagedCluster instance: %T", parent.Item)
-	}
+	mc := parent.Item.(containerservice.ManagedCluster)
 	if mc.PodIdentityProfile == nil ||
 		mc.PodIdentityProfile.UserAssignedIdentities == nil {
 		return nil

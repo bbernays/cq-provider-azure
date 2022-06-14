@@ -19,6 +19,10 @@ var errorCodeDescriptions = map[interface{}]string{
 	http.StatusForbidden:  "You are not authorized to perform this operation.",
 }
 
+var (
+	uuidRegex = regexp.MustCompile(`(\W)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}(\W)`)
+)
+
 func ErrorClassifier(meta schema.ClientMeta, resourceName string, err error) diag.Diagnostics {
 	client := meta.(*Client)
 	return classifyError(err, diag.RESOLVING, client.SubscriptionId, diag.WithResourceName(resourceName))
@@ -27,12 +31,20 @@ func ErrorClassifier(meta schema.ClientMeta, resourceName string, err error) dia
 func classifyError(err error, fallbackType diag.Type, subId string, opts ...diag.BaseErrorOption) diag.Diagnostics {
 	var (
 		detailedError autorest.DetailedError
-		reqError      azure.RequestError
+		reqError      *azure.RequestError
 	)
 	if errors.As(err, &detailedError) {
-		if errors.As(detailedError.Original, &reqError) && reqError.ServiceError != nil && reqError.ServiceError.Code == "DisallowedOperation" {
-			return diag.Diagnostics{
-				RedactError(subId, diag.NewBaseError(err, diag.ACCESS, append(opts, diag.WithType(diag.ACCESS), diag.WithSeverity(diag.WARNING), ParseSummaryMessage(subId, err, detailedError), diag.WithDetails("%s", errorCodeDescriptions[detailedError.StatusCode]))...)),
+		if errors.As(detailedError.Original, &reqError) && reqError.ServiceError != nil {
+			switch reqError.ServiceError.Code {
+			case "DisallowedOperation":
+				return diag.Diagnostics{
+					RedactError(subId, diag.NewBaseError(err, diag.ACCESS, append(opts, diag.WithType(diag.ACCESS), diag.WithSeverity(diag.WARNING), ParseSummaryMessage(subId, err, detailedError), diag.WithDetails("%s", errorCodeDescriptions[detailedError.StatusCode]))...)),
+				}
+			case "SubscriptionNotRegistered":
+			case "Subscription Not Registered":
+				return diag.Diagnostics{
+					RedactError(subId, diag.NewBaseError(err, diag.ACCESS, append(opts, diag.WithType(diag.ACCESS), diag.WithSeverity(diag.WARNING), ParseSummaryMessage(subId, err, detailedError), diag.WithDetails("%s", errorCodeDescriptions[detailedError.StatusCode]))...)),
+				}
 			}
 		}
 
@@ -91,10 +103,6 @@ func RedactError(subId string, e diag.Diagnostic) diag.Diagnostic {
 	)
 	return diag.NewRedactedDiagnostic(e, r)
 }
-
-var (
-	uuidRegex = regexp.MustCompile(`(\W)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}(\W)`)
-)
 
 func removePII(subId string, msg string) string {
 	if subId != "" {

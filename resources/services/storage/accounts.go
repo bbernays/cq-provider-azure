@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-01-01/storage"
 	"github.com/Azure/go-autorest/autorest"
@@ -681,7 +680,6 @@ func StorageAccounts() *schema.Table {
 				Name:          "azure_storage_account_network_rule_set_virtual_network_rules",
 				Description:   "VirtualNetworkRule virtual Network rule. ",
 				Resolver:      fetchStorageAccountNetworkRuleSetVirtualNetworkRules,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "virtual_network_resource_id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -712,7 +710,6 @@ func StorageAccounts() *schema.Table {
 				Name:          "azure_storage_account_network_rule_set_ip_rules",
 				Description:   "IPRule IP rule with specific IP or IP range in CIDR format. ",
 				Resolver:      fetchStorageAccountNetworkRuleSetIpRules,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "ip_address_or_range"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -738,7 +735,6 @@ func StorageAccounts() *schema.Table {
 				Name:          "azure_storage_account_private_endpoint_connections",
 				Description:   "Azure storage account private endpoint connection",
 				Resolver:      fetchStorageAccountPrivateEndpointConnections,
-				Options:       schema.TableCreationOptions{PrimaryKeys: []string{"account_cq_id", "id"}},
 				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
@@ -827,7 +823,7 @@ func resolveStorageAccountBlobRestoreStatusParametersBlobRanges(_ context.Contex
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	return resource.Set("blob_restore_status_parameters_blob_ranges", data)
+	return diag.WrapError(resource.Set("blob_restore_status_parameters_blob_ranges", data))
 }
 func fetchStorageAccountNetworkRuleSetVirtualNetworkRules(_ context.Context, _ schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	account := parent.Item.(storage.Account)
@@ -855,22 +851,19 @@ func fetchStorageAccountPrivateEndpointConnections(_ context.Context, _ schema.C
 }
 
 func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	acc, ok := resource.Item.(storage.Account)
-	if !ok {
-		return fmt.Errorf("not a storage.Account: %T", resource.Item)
-	}
+	acc := resource.Item.(storage.Account)
 
 	if !isBlobSupported(&acc) {
 		return nil
 	}
 
-	// fetch storage account keys for Shared Key authentication
-	storage := meta.(*client.Client).Services().Storage
+	// fetch storageClient account keys for Shared Key authentication
+	storageClient := meta.(*client.Client).Services().Storage
 	details, err := client.ParseResourceID(*acc.ID)
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	keysResult, err := storage.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
+	keysResult, err := storageClient.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
 	if err != nil {
 		if client.IgnoreAccessDenied(err) {
 			meta.Logger().Warn("received access denied on Accounts.ListKeys", "resource_group", details.ResourceGroup, "account", *acc.Name, "err", err)
@@ -887,7 +880,7 @@ func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.Cli
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	blobProps := storage.NewBlobServiceProperties(auth)
+	blobProps := storageClient.NewBlobServiceProperties(auth)
 	result, err := blobProps.GetServiceProperties(ctx, *acc.Name)
 	if err != nil {
 		// For premium 'page blob' storage accounts, we sometimes get "authorization error", not sure why.
@@ -906,26 +899,22 @@ func fetchStorageAccountBlobLoggingSettings(ctx context.Context, meta schema.Cli
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	return resource.Set(c.Name, data)
+	return diag.WrapError(resource.Set(c.Name, data))
 }
 
 func fetchStorageAccountQueueLoggingSettings(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-	acc, ok := resource.Item.(storage.Account)
-	if !ok {
-		return fmt.Errorf("not a storage.Account: %T", resource.Item)
-	}
-
+	acc := resource.Item.(storage.Account)
 	if !isQueueSupported(&acc) {
 		return nil
 	}
 
 	// fetch storage account keys for Shared Key authentication
-	storage := meta.(*client.Client).Services().Storage
+	storageClient := meta.(*client.Client).Services().Storage
 	details, err := client.ParseResourceID(*acc.ID)
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	keysResult, err := storage.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
+	keysResult, err := storageClient.Accounts.ListKeys(ctx, details.ResourceGroup, *acc.Name, "")
 	if err != nil {
 		if client.IgnoreAccessDenied(err) {
 			meta.Logger().Warn("received access denied on Accounts.ListKeys", "resource_group", details.ResourceGroup, "account", *acc.Name, "err", err)
@@ -941,7 +930,7 @@ func fetchStorageAccountQueueLoggingSettings(ctx context.Context, meta schema.Cl
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	blobProps := storage.NewQueueServiceProperties(auth)
+	blobProps := storageClient.NewQueueServiceProperties(auth)
 	result, err := blobProps.GetServiceProperties(ctx, *acc.Name)
 	if err != nil {
 		return diag.WrapError(err)
@@ -950,7 +939,7 @@ func fetchStorageAccountQueueLoggingSettings(ctx context.Context, meta schema.Cl
 	if err != nil {
 		return diag.WrapError(err)
 	}
-	return resource.Set(c.Name, data)
+	return diag.WrapError(resource.Set(c.Name, data))
 }
 
 // isQueueSupported checks whether queues are supported for a storage account.

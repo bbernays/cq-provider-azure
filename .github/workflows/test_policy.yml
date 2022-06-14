@@ -16,7 +16,7 @@ jobs:
   PolicyTest:
     strategy:
       matrix:
-        dbversion: [ "postgres:latest" ]
+        dbversion: [ "postgres:10" ]
         go: [ "1.17" ]
         platform: [ ubuntu-latest ] # can not run in macOS and widnowsOS
     runs-on: ${{ matrix.platform }}
@@ -37,7 +37,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Check out code into the policy directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download Cloudquery
         run: |
@@ -48,8 +48,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-
-          steps:
 
       - uses: actions/cache@v3
         with:

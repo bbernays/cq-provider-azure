@@ -2,7 +2,6 @@ package network
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 	"github.com/cloudquery/cq-provider-azure/client"
@@ -12,13 +11,12 @@ import (
 
 func NetworkExpressRouteGateways() *schema.Table {
 	return &schema.Table{
-		Name:          "azure_network_express_route_gateways",
-		Description:   "Azure Network Express Route Gateways",
-		Resolver:      fetchNetworkExpressRouteGateways,
-		Multiplex:     client.SubscriptionMultiplex,
-		DeleteFilter:  client.DeleteSubscriptionFilter,
-		Options:       schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
-		IgnoreInTests: true,
+		Name:         "azure_network_express_route_gateways",
+		Description:  "Azure Network Express Route Gateways",
+		Resolver:     fetchNetworkExpressRouteGateways,
+		Multiplex:    client.SubscriptionMultiplex,
+		DeleteFilter: client.DeleteSubscriptionFilter,
+		Options:      schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
 		Columns: []schema.Column{
 			{
 				Name:        "subscription_id",
@@ -33,10 +31,11 @@ func NetworkExpressRouteGateways() *schema.Table {
 				Resolver:    schema.PathResolver("ID"),
 			},
 			{
-				Name:        "auto_scale_configuration_bound_max",
-				Description: "Maximum number of scale units deployed for ExpressRoute gateway.",
-				Type:        schema.TypeInt,
-				Resolver:    schema.PathResolver("ExpressRouteGatewayProperties.AutoScaleConfiguration.Bounds.Max"),
+				Name:          "auto_scale_configuration_bound_max",
+				Description:   "Maximum number of scale units deployed for ExpressRoute gateway.",
+				Type:          schema.TypeInt,
+				Resolver:      schema.PathResolver("ExpressRouteGatewayProperties.AutoScaleConfiguration.Bounds.Max"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "auto_scale_configuration_bound_min",
@@ -84,10 +83,10 @@ func NetworkExpressRouteGateways() *schema.Table {
 		},
 		Relations: []*schema.Table{
 			{
-				Name:        "azure_network_express_route_connections",
-				Description: "ExpressRouteConnection resource.",
-				Resolver:    fetchNetworkExpressRouteConnections,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"express_route_gateway_cq_id", "id"}},
+				Name:          "azure_network_express_route_connections",
+				Description:   "ExpressRouteConnection resource.",
+				Resolver:      fetchNetworkExpressRouteConnections,
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "express_route_gateway_cq_id",
@@ -159,10 +158,7 @@ func fetchNetworkExpressRouteGateways(ctx context.Context, meta schema.ClientMet
 	return nil
 }
 func fetchNetworkExpressRouteConnections(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	erg, ok := parent.Item.(network.ExpressRouteGateway)
-	if !ok {
-		return fmt.Errorf("expected to have network.ExpressRouteGateway but got %T", parent.Item)
-	}
+	erg := parent.Item.(network.ExpressRouteGateway)
 	if erg.ExpressRouteGatewayProperties != nil && erg.ExpressRouteGatewayProperties.ExpressRouteConnections != nil {
 		res <- *erg.ExpressRouteGatewayProperties.ExpressRouteConnections
 	}

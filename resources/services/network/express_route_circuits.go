@@ -2,7 +2,6 @@ package network
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 	"github.com/cloudquery/cq-provider-azure/client"
@@ -12,13 +11,12 @@ import (
 
 func NetworkExpressRouteCircuits() *schema.Table {
 	return &schema.Table{
-		Name:          "azure_network_express_route_circuits",
-		Description:   "Azure Network Express Route Circuits",
-		Resolver:      fetchNetworkExpressRouteCircuits,
-		Multiplex:     client.SubscriptionMultiplex,
-		DeleteFilter:  client.DeleteSubscriptionFilter,
-		Options:       schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
-		IgnoreInTests: true,
+		Name:         "azure_network_express_route_circuits",
+		Description:  "Azure Network Express Route Circuits",
+		Resolver:     fetchNetworkExpressRouteCircuits,
+		Multiplex:    client.SubscriptionMultiplex,
+		DeleteFilter: client.DeleteSubscriptionFilter,
+		Options:      schema.TableCreationOptions{PrimaryKeys: []string{"subscription_id", "id"}},
 		Columns: []schema.Column{
 			{
 				Name:        "subscription_id",
@@ -39,10 +37,11 @@ func NetworkExpressRouteCircuits() *schema.Table {
 				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.AllowClassicOperations"),
 			},
 			{
-				Name:        "bandwidth_in_gbps",
-				Description: "The bandwidth of the circuit when the circuit is provisioned on an ExpressRoutePort resource.",
-				Type:        schema.TypeFloat,
-				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.BandwidthInGbps"),
+				Name:          "bandwidth_in_gbps",
+				Description:   "The bandwidth of the circuit when the circuit is provisioned on an ExpressRoutePort resource.",
+				Type:          schema.TypeFloat,
+				Resolver:      schema.PathResolver("ExpressRouteCircuitPropertiesFormat.BandwidthInGbps"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "circuit_provisioning_state",
@@ -56,16 +55,18 @@ func NetworkExpressRouteCircuits() *schema.Table {
 				Type:        schema.TypeString,
 			},
 			{
-				Name:        "express_route_port_id",
-				Description: "The reference to the ExpressRoutePort resource when the circuit is provisioned on an ExpressRoutePort resource.",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.ExpressRoutePort.ID"),
+				Name:          "express_route_port_id",
+				Description:   "The reference to the ExpressRoutePort resource when the circuit is provisioned on an ExpressRoutePort resource.",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ExpressRouteCircuitPropertiesFormat.ExpressRoutePort.ID"),
+				IgnoreInTests: true,
 			},
 			{
-				Name:        "gateway_manager_etag",
-				Description: "The GatewayManager Etag.",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.GatewayManagerEtag"),
+				Name:          "gateway_manager_etag",
+				Description:   "The GatewayManager Etag.",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ExpressRouteCircuitPropertiesFormat.GatewayManagerEtag"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "global_reach_enabled",
@@ -96,10 +97,11 @@ func NetworkExpressRouteCircuits() *schema.Table {
 				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.ServiceKey"),
 			},
 			{
-				Name:        "service_provider_notes",
-				Description: "The ServiceProviderNotes.",
-				Type:        schema.TypeString,
-				Resolver:    schema.PathResolver("ExpressRouteCircuitPropertiesFormat.ServiceProviderNotes"),
+				Name:          "service_provider_notes",
+				Description:   "The ServiceProviderNotes.",
+				Type:          schema.TypeString,
+				Resolver:      schema.PathResolver("ExpressRouteCircuitPropertiesFormat.ServiceProviderNotes"),
+				IgnoreInTests: true,
 			},
 			{
 				Name:        "service_provider_properties_bandwidth_in_mbps",
@@ -162,10 +164,10 @@ func NetworkExpressRouteCircuits() *schema.Table {
 		},
 		Relations: []*schema.Table{
 			{
-				Name:        "azure_network_express_route_circuit_authorizations",
-				Description: "Authorization in an ExpressRouteCircuit resource.",
-				Resolver:    fetchNetworkExpressRouteCircuitAuthorizations,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"express_route_circuit_cq_id", "id"}},
+				Name:          "azure_network_express_route_circuit_authorizations",
+				Description:   "Authorization in an ExpressRouteCircuit resource.",
+				Resolver:      fetchNetworkExpressRouteCircuitAuthorizations,
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "express_route_circuit_cq_id",
@@ -215,10 +217,10 @@ func NetworkExpressRouteCircuits() *schema.Table {
 				},
 			},
 			{
-				Name:        "azure_network_express_route_circuit_peerings",
-				Description: "Peering in an ExpressRouteCircuit resource.",
-				Resolver:    fetchNetworkExpressRouteCircuitPeerings,
-				Options:     schema.TableCreationOptions{PrimaryKeys: []string{"express_route_circuit_cq_id", "id"}},
+				Name:          "azure_network_express_route_circuit_peerings",
+				Description:   "Peering in an ExpressRouteCircuit resource.",
+				Resolver:      fetchNetworkExpressRouteCircuitPeerings,
+				IgnoreInTests: true,
 				Columns: []schema.Column{
 					{
 						Name:        "express_route_circuit_cq_id",
@@ -433,7 +435,6 @@ func NetworkExpressRouteCircuits() *schema.Table {
 						Name:        "azure_network_express_route_circuit_connections",
 						Description: "Express Route Circuit Connection in an ExpressRouteCircuitPeering resource.",
 						Resolver:    fetchNetworkExpressRouteCircuitConnections,
-						Options:     schema.TableCreationOptions{PrimaryKeys: []string{"express_route_circuit_peering_cq_id", "id"}},
 						Columns: []schema.Column{
 							{
 								Name:        "express_route_circuit_peering_cq_id",
@@ -510,7 +511,6 @@ func NetworkExpressRouteCircuits() *schema.Table {
 						Name:        "azure_network_peer_express_route_circuit_connections",
 						Description: "Peer Express Route Circuit Connection in an ExpressRouteCircuitPeering resource.",
 						Resolver:    fetchNetworkPeerExpressRouteCircuitConnections,
-						Options:     schema.TableCreationOptions{PrimaryKeys: []string{"express_route_circuit_peering_cq_id", "id"}},
 						Columns: []schema.Column{
 							{
 								Name:        "express_route_circuit_peering_cq_id",
@@ -608,40 +608,28 @@ func fetchNetworkExpressRouteCircuits(ctx context.Context, meta schema.ClientMet
 	return nil
 }
 func fetchNetworkExpressRouteCircuitAuthorizations(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	erc, ok := parent.Item.(network.ExpressRouteCircuit)
-	if !ok {
-		return fmt.Errorf("expected to have network.ExpressRouteCircuit but got %T", parent.Item)
-	}
+	erc := parent.Item.(network.ExpressRouteCircuit)
 	if erc.ExpressRouteCircuitPropertiesFormat != nil && erc.ExpressRouteCircuitPropertiesFormat.Authorizations != nil {
 		res <- *erc.ExpressRouteCircuitPropertiesFormat.Authorizations
 	}
 	return nil
 }
 func fetchNetworkExpressRouteCircuitPeerings(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	erc, ok := parent.Item.(network.ExpressRouteCircuit)
-	if !ok {
-		return fmt.Errorf("expected to have network.ExpressRouteCircuit but got %T", parent.Item)
-	}
+	erc := parent.Item.(network.ExpressRouteCircuit)
 	if erc.ExpressRouteCircuitPropertiesFormat != nil && erc.ExpressRouteCircuitPropertiesFormat.Peerings != nil {
 		res <- *erc.ExpressRouteCircuitPropertiesFormat.Peerings
 	}
 	return nil
 }
 func fetchNetworkExpressRouteCircuitConnections(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	rcp, ok := parent.Item.(network.ExpressRouteCircuitPeering)
-	if !ok {
-		return fmt.Errorf("expected to have network.ExpressRouteCircuitPeering but got %T", parent.Item)
-	}
+	rcp := parent.Item.(network.ExpressRouteCircuitPeering)
 	if rcp.ExpressRouteCircuitPeeringPropertiesFormat != nil && rcp.ExpressRouteCircuitPeeringPropertiesFormat.Connections != nil {
 		res <- *rcp.ExpressRouteCircuitPeeringPropertiesFormat.Connections
 	}
 	return nil
 }
 func fetchNetworkPeerExpressRouteCircuitConnections(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	rcp, ok := parent.Item.(network.ExpressRouteCircuitPeering)
-	if !ok {
-		return fmt.Errorf("expected to have network.ExpressRouteCircuitPeering but got %T", parent.Item)
-	}
+	rcp := parent.Item.(network.ExpressRouteCircuitPeering)
 	if rcp.ExpressRouteCircuitPeeringPropertiesFormat != nil && rcp.ExpressRouteCircuitPeeringPropertiesFormat.PeeredConnections != nil {
 		res <- *rcp.ExpressRouteCircuitPeeringPropertiesFormat.PeeredConnections
 	}

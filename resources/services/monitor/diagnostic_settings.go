@@ -3,7 +3,6 @@ package monitor
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2021-07-01-preview/insights"
 	"github.com/Azure/go-autorest/autorest/azure"
@@ -13,6 +12,21 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/semaphore"
 )
+
+// diagnosticSetting is a custom copy of insights.DiagnosticSettingsResource with extra ResourceURI field
+type diagnosticSetting struct {
+	// DiagnosticSettings - Properties of a Diagnostic Settings Resource.
+	*insights.DiagnosticSettings `json:"properties,omitempty"`
+	// ID - READ-ONLY; Azure resource Id
+	ID *string `json:"id,omitempty"`
+	// Name - READ-ONLY; Azure resource name
+	Name *string `json:"name,omitempty"`
+	// Type - READ-ONLY; Azure resource type
+	Type *string `json:"type,omitempty"`
+
+	// ResourceURI is a resource URI which this diagnostic setting belongs to
+	ResourceURI string
+}
 
 func MonitorDiagnosticSettings() *schema.Table {
 	return &schema.Table{
@@ -184,21 +198,6 @@ func MonitorDiagnosticSettings() *schema.Table {
 	}
 }
 
-// diagnosticSetting is a custom copy of insights.DiagnosticSettingsResource with extra ResourceURI field
-type diagnosticSetting struct {
-	// DiagnosticSettings - Properties of a Diagnostic Settings Resource.
-	*insights.DiagnosticSettings `json:"properties,omitempty"`
-	// ID - READ-ONLY; Azure resource Id
-	ID *string `json:"id,omitempty"`
-	// Name - READ-ONLY; Azure resource name
-	Name *string `json:"name,omitempty"`
-	// Type - READ-ONLY; Azure resource type
-	Type *string `json:"type,omitempty"`
-
-	// ResourceURI is a resource URI which this diagnostic setting belongs to
-	ResourceURI string
-}
-
 // ====================================================================================================================
 //                                               Table Resolver Functions
 // ====================================================================================================================
@@ -223,7 +222,7 @@ func fetchMonitorDiagnosticSettings(ctx context.Context, meta schema.ClientMeta,
 		id := i
 		g.Go(func() error {
 			if err := limiter.Acquire(ctx, 1); err != nil {
-				return err
+				return diag.WrapError(err)
 			}
 			defer limiter.Release(1)
 			response, err := monSvc.List(ctx, id)
@@ -249,17 +248,12 @@ func fetchMonitorDiagnosticSettings(ctx context.Context, meta schema.ClientMeta,
 		})
 	}
 
-	if err := g.Wait(); err != nil {
-		return err
-	}
+	err = g.Wait()
 
-	return nil
+	return diag.WrapError(err)
 }
 func fetchMonitorDiagnosticSettingMetrics(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(diagnosticSetting)
-	if !ok {
-		return fmt.Errorf("expected insights.DiagnosticSettingsResource but got %T", parent.Item)
-	}
+	p := parent.Item.(diagnosticSetting)
 	if p.DiagnosticSettings == nil ||
 		p.DiagnosticSettings.Metrics == nil {
 		return nil
@@ -269,10 +263,7 @@ func fetchMonitorDiagnosticSettingMetrics(ctx context.Context, meta schema.Clien
 	return nil
 }
 func fetchMonitorDiagnosticSettingLogs(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	p, ok := parent.Item.(diagnosticSetting)
-	if !ok {
-		return fmt.Errorf("expected insights.DiagnosticSettingsResource but got %T", parent.Item)
-	}
+	p := parent.Item.(diagnosticSetting)
 	if p.DiagnosticSettings == nil ||
 		p.DiagnosticSettings.Logs == nil {
 		return nil
